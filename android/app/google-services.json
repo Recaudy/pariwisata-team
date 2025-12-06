@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "3292070646",
+    "project_id": "wisata-bangka",
+    "storage_bucket": "wisata-bangka.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:3292070646:android:2c7a59da8a3361b3fd22d7",
+        "android_client_info": {
+          "package_name": "com.example.project_uts_pariwisata"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnIZJhj7T29GQKo9B3PHJut6faueZhm_o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
