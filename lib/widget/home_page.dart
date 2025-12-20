@@ -1,150 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart'; 
-import 'package:project_uts_pariwisata/models/popular_model.dart';
-import 'package:project_uts_pariwisata/models/recomend_model.dart';
-import 'package:project_uts_pariwisata/widget/pemesanan_page.dart';
-import 'package:project_uts_pariwisata/widget/profile_page.dart';
-import 'package:project_uts_pariwisata/widget/saran_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../components/custom_drawer.dart';
+import 'detail_page.dart';
+import 'wisata_tab_view_page.dart';
 
-import '../services/api_service.dart';
-import '../models/cuaca_model.dart';
-
-class WeatherCardRow extends StatelessWidget {
-  final ApiService apiService = ApiService();
-
-  WeatherCardRow({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: 140,
-          child: FutureBuilder<List<CuacaModel>>(
-            future: apiService.fetchCuacaHariIni(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Text(
-                    'Gagal: ${snapshot.error}',
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                );
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(
-                  child: Text('Tidak ada data cuaca saat ini.'),
-                );
-              } else {
-                final allCuaca = snapshot.data!;
-
-                final Map<String, CuacaModel> distinctCuaca = {};
-                for (var cuaca in allCuaca) {
-                  if (!distinctCuaca.containsKey(cuaca.locationName)) {
-                    distinctCuaca[cuaca.locationName] = cuaca;
-                  }
-                }
-                final cuacaList = distinctCuaca.values.toList();
-
-                return ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: cuacaList.length,
-                  itemBuilder: (context, index) {
-                    final cuaca = cuacaList[index];
-
-                    String locationShort = cuaca.locationName
-                        .split('(')[0]
-                        .trim();
-
-                    return Container(
-                      width: 130,
-                      margin: EdgeInsets.only(
-                        left: index == 0 ? 20 : 8,
-                        right: index == cuacaList.length - 1 ? 20 : 0,
-                      ),
-                      child: Card(
-                        color: Colors.white,
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              cuaca.imageUrl.endsWith('.svg')
-                                  ? SvgPicture.network(
-                                      cuaca.imageUrl,
-                                      width: 32,
-                                      height: 32,
-                                      placeholderBuilder: (context) =>
-                                          const SizedBox(width: 32, height: 32),
-                                      fit: BoxFit.contain,
-                                    )
-                                  : Image.network(
-                                      cuaca.imageUrl,
-                                      width: 32,
-                                      height: 32,
-                                      fit: BoxFit.contain,
-                                      errorBuilder:
-                                          (context, error, stackTrace) =>
-                                              const Icon(
-                                                Icons.cloud_off,
-                                                size: 32,
-                                                color: Colors.grey,
-                                              ),
-                                    ),
-
-                              const SizedBox(height: 4),
-
-                              Text(
-                                '${cuaca.temperature}°C',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                              ),
-
-                              Text(
-                                locationShort,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.blue[800],
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-
-                              Text(
-                                cuaca.weatherDesc,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.grey,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              }
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-// --- End Weather Widget ---
+const Color primaryColor = Color(0xFF21899C);
 
 class HomePageWidget extends StatefulWidget {
   const HomePageWidget({super.key});
@@ -154,198 +14,389 @@ class HomePageWidget extends StatefulWidget {
 }
 
 class _HomePageWidgetState extends State<HomePageWidget> {
+  // Data untuk Filter Tab
+  String selectedExploreTab = 'All';
+  final List<String> exploreTabs = ['All', 'Popular', 'Recomended'];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(backgroundColor: Colors.grey[100], elevation: 0),
-
-      // drawer start
-      drawer: Drawer(
-        child: Container(
-          color: Colors.grey[100],
-          padding: const EdgeInsets.all(24),
-          child: Wrap(
-            runSpacing: 16,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title: Builder(
+          builder: (context) => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Placeholder for user's profile icon/header
-              const DrawerHeader(
-                decoration: BoxDecoration(color: Colors.blueAccent),
-                child: Text(
-                  'Menu Pariwisata',
-                  style: TextStyle(color: Colors.white, fontSize: 24),
+              InkWell(
+                onTap: () => Scaffold.of(context).openDrawer(),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.menu, color: Colors.black),
                 ),
               ),
-              ListTile(
-                leading: const Icon(Icons.person),
-                title: const Text("Profil"),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const InformasiProfil(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.feedback_outlined),
-                title: const Text("Recommend"),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MyCustomForm(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.credit_card),
-                title: const Text("Order"),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const InfoPemesanan(),
-                    ),
-                  );
-                },
-              ),
+
+              const SizedBox(width: 40), // Spacer agar teks tengah
             ],
           ),
         ),
       ),
+      drawer: const CustomDrawer(),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 10),
+              _buildSearchBar(),
 
-      // drawer end
-      body: SingleChildScrollView(
+              // Bagian Explore Cities dengan Filter dan Firebase
+              _buildExploreCitiesSection(),
+
+              const SizedBox(height: 20),
+              _buildCategoriesSection(),
+              const SizedBox(height: 40),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const TextField(
+          decoration: InputDecoration(
+            hintText: "Discover city",
+            border: InputBorder.none,
+            prefixIcon: Icon(Icons.search, color: Colors.black54),
+            suffixIcon: Icon(Icons.sort_sharp, color: Colors.black54),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExploreCitiesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(padding: EdgeInsets.only(left: 20, top: 20, bottom: 10)),
+
+        // --- TOMBOL FILTER (All, Popular, Recomended) ---
+        SizedBox(
+          height: 40,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: exploreTabs.length,
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            itemBuilder: (context, index) {
+              final tab = exploreTabs[index];
+              final isSelected = tab == selectedExploreTab;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedExploreTab = tab;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected ? primaryColor : Colors.transparent,
+                      borderRadius: BorderRadius.circular(20),
+                      border: isSelected
+                          ? null
+                          : Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Text(
+                      tab,
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : Colors.black87,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+
+        const SizedBox(height: 15),
+
+        // --- DAFTAR WISATA DARI FIREBASE ---
+        SizedBox(
+          height: 260,
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('wisata').snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) return const Center(child: Text("Error"));
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final docs = snapshot.data!.docs;
+
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                itemCount: docs.length,
+                itemBuilder: (context, index) {
+                  final data = docs[index].data() as Map<String, dynamic>;
+
+                  return PopularCardExplore(
+                    title: data['nama'] ?? 'Tanpa Nama',
+                    subtitle: data['sub_judul'] ?? 'Lokasi tidak diketahui',
+                    image: data['image'] ?? '',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailPage(wisataData: data),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoriesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Text(
+            "Categories",
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ),
+        SizedBox(
+          height: 100,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              const SizedBox(width: 20),
+              CategoryIcon(
+                title: "Pantai",
+                iconAsset: "assets/icons/beach.png",
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const WisataTabViewPage(initialIndex: 0),
+                  ),
+                ),
+              ),
+              CategoryIcon(
+                title: "Bukit",
+                iconAsset: "assets/icons/mountain.png",
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const WisataTabViewPage(initialIndex: 1),
+                  ),
+                ),
+              ),
+              CategoryIcon(
+                title: "Religi",
+                iconAsset: "assets/icons/mosque.png",
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const WisataTabViewPage(initialIndex: 2),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PopularCardExplore extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final String image;
+  final VoidCallback onTap;
+
+  const PopularCardExplore({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.image,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 190,
+      margin: const EdgeInsets.only(right: 15, top: 10, bottom: 10),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Search Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 5,
-                  horizontal: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.3),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Stack(
+                children: [
+                  image.startsWith('http')
+                      ? Image.network(
+                          image,
+                          height: 180,
+                          width: 190,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.asset(
+                          image,
+                          height: 180,
+                          width: 190,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                color: Colors.grey[200],
+                                height: 180,
+                                width: 190,
+                                child: const Icon(Icons.broken_image),
+                              ),
+                        ),
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: Colors.black38,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(
+                        Icons.favorite_border,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
-                  ],
-                ),
-                child: const TextField(
-                  decoration: InputDecoration(
-                    hintText: "Temukan Tempat ",
-                    border: InputBorder.none,
-                    prefixIcon: Icon(Icons.search, color: Colors.blue),
-                  ),
-                ),
-              ),
-            ),
-
-            // ===========================================
-            // NEW: Weather Section (Below Search, Above Populer)
-            // ===========================================
-            WeatherCardRow(), // <-- WIDGET CUACA DIMASUKKAN DI SINI
-            // Populer Start
-            const SizedBox(height: 20),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                "Populer",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-
-            SizedBox(
-              height: 300,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  PopularCard(
-                    title: "Borobudur Temple",
-                    title2: "Magelang,Jawa Tengah",
-                    image: "assets/images/borobudur.jpg",
-                  ),
-                  PopularCard(
-                    title: "Pantai Kuta",
-                    title2: "Bali",
-                    image: "assets/images/kuta.jpg",
-                  ),
-                  PopularCard(
-                    title: " Gunung Rinjani",
-                    title2: "Lombok,Nusa Tenggara timur",
-                    image: "assets/images/rinjani.jpg",
-                  ),
-                  PopularCard(
-                    title: " Pantai Nihiwatu",
-                    title2: "Sumba,Nusa Tenggara timur",
-                    image: "assets/images/nihiwatu.jpg",
-                  ),
-                  PopularCard(
-                    title: "Borobudur Temple",
-                    title2: "Yogyakarta",
-                    image: "assets/images/borobudur.jpg",
                   ),
                 ],
               ),
             ),
-            // Populer End
-
-            // Rekomendasi Start
-            const SizedBox(height: 20),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                "Recomend",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-
-            SizedBox(
-              height: 140,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0, left: 5.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  RecomendCard(
-                    title: "Borobudur Temple",
-                    title2: "Yogyakarta",
-                    image: "assets/images/borobudur.jpg",
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  RecomendCard(
-                    title: "Pantai Kuta",
-                    title2: "Bali",
-                    image: "assets/images/kuta.jpg",
-                  ),
-                  RecomendCard(
-                    title: " Gunung Rinjani",
-                    title2: "Lombok,Nusa Tenggara timur",
-                    image: "assets/images/rinjani.jpg",
-                  ),
-                  RecomendCard(
-                    title: " Pantai Nihiwatu",
-                    title2: "Sumba,Nusa Tenggara timur",
-                    image: "assets/images/nihiwatu.jpg",
-                  ),
-                  RecomendCard(
-                    title: "Borobudur Temple",
-                    title2: "Magelang,Jawa Tengah",
-                    image: "assets/images/borobudur.jpg",
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_pin,
+                        color: Colors.grey,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          subtitle,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            // rekomendasi end
-            const SizedBox(height: 40),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CategoryIcon extends StatelessWidget {
+  final String title;
+  final String iconAsset;
+  final VoidCallback onTap;
+
+  const CategoryIcon({
+    super.key,
+    required this.title,
+    required this.iconAsset,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        width: 80,
+        margin: const EdgeInsets.only(right: 10),
+        child: Column(
+          children: [
+            Container(
+              height: 60,
+              width: 60,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Center(
+                child: Image.asset(iconAsset, height: 35, width: 35),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 12, color: Colors.black54),
+            ),
           ],
         ),
       ),

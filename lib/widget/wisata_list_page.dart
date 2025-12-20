@@ -14,84 +14,39 @@ class WisataListPage extends StatelessWidget {
       stream: ref.where('kategori', isEqualTo: kategori).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Center(child: Text('Terjadi kesalahan'));
+          return Center(child: Text('Terjadi kesalahan'));
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator());
         }
 
         final docs = snapshot.data!.docs;
 
         if (docs.isEmpty) {
-          return const Center(child: Text('Belum ada data'));
+          return Center(child: Text('Belum ada data'));
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(12),
           itemCount: docs.length,
           itemBuilder: (context, index) {
             final doc = docs[index];
             final raw = doc.data();
             if (raw is! Map<String, dynamic>) {
-              return const SizedBox.shrink();
+              return SizedBox.shrink();
             }
             final data = raw;
+
             final nama = (data['nama'] ?? 'Tanpa nama').toString();
             final subJudul = (data['sub_judul'] ?? '').toString();
             final image = (data['image'] ?? '').toString();
 
-            Widget leadingImage;
-            if (image.isEmpty) {
-              leadingImage = Container(
-                width: 90,
-                height: 70,
-                color: Colors.grey.shade200,
-                child: const Icon(
-                  Icons.image_not_supported,
-                  color: Colors.grey,
-                ),
-              );
-            } else if (image.startsWith('http')) {
-              leadingImage = ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: Image.network(
-                  image,
-                  width: 90,
-                  height: 70,
-                  fit: BoxFit.cover,
-                  errorBuilder: (c, e, s) => Container(
-                    width: 90,
-                    height: 70,
-                    color: Colors.grey.shade200,
-                    child: const Icon(Icons.broken_image, color: Colors.grey),
-                  ),
-                ),
-              );
-            } else {
-              // treat as asset path
-              leadingImage = ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: Image.asset(
-                  image,
-                  width: 90,
-                  height: 70,
-                  fit: BoxFit.cover,
-                  errorBuilder: (c, e, s) => Container(
-                    width: 90,
-                    height: 70,
-                    color: Colors.grey.shade200,
-                    child: const Icon(Icons.broken_image, color: Colors.grey),
-                  ),
-                ),
-              );
-            }
-
             return Card(
-              elevation: 2,
-              margin: const EdgeInsets.only(bottom: 12),
+              elevation: 3,
+              margin: EdgeInsets.only(bottom: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: InkWell(
                 onTap: () {
@@ -112,39 +67,100 @@ class WisataListPage extends StatelessWidget {
                     ),
                   );
                 },
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
+                child: Container(
+                  height: 180,
+                  child: Stack(
                     children: [
-                      leadingImage,
-                      const SizedBox(width: 12),
-                      Expanded(
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: image.isEmpty
+                            ? Container(color: Colors.grey.shade300)
+                            : (image.startsWith('http')
+                                  ? Image.network(
+                                      image,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (c, e, s) {
+                                        return Container(
+                                          color: Colors.grey.shade300,
+                                        );
+                                      },
+                                    )
+                                  : Image.asset(
+                                      image,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (c, e, s) {
+                                        return Container(
+                                          color: Colors.grey.shade300,
+                                        );
+                                      },
+                                    )),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               nama,
-                              style: const TextStyle(
+                              style: TextStyle(
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                                color: Colors.white,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black,
+                                    blurRadius: 10,
+                                    offset: Offset(2, 2),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 6),
                             Text(
                               subJudul,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black,
+                                    blurRadius: 8,
+                                    offset: Offset(1, 1),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              (data['desc'] ?? '').toString(),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.black54,
+                            SizedBox(height: 10),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.bottomLeft,
+                                child: Text(
+                                  (data['desc'] ?? '').toString(),
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black,
+                                        blurRadius: 8,
+                                        offset: Offset(1, 1),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ],

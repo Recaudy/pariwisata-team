@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'aksi_icon.dart';
 
 class DetailPage extends StatelessWidget {
   final Map<String, dynamic> wisataData;
@@ -11,130 +12,162 @@ class DetailPage extends StatelessWidget {
     final image = (wisataData['image'] ?? '').toString();
     final desc = (wisataData['desc'] ?? '').toString();
     final sejarah = (wisataData['sejarah'] ?? '').toString();
+    final wisataId = wisataData['id']; // ✅ AMBIL ID DI SINI
+
+    final screenHeight = MediaQuery.of(context).size.height;
 
     Widget headerImage;
+
     if (image.isEmpty) {
       headerImage = Container(
         width: double.infinity,
-        height: 200,
+        height: screenHeight * 0.6,
         color: Colors.grey.shade200,
         alignment: Alignment.center,
-        child: const Icon(
-          Icons.image_not_supported,
-          size: 48,
-          color: Colors.grey,
-        ),
+        child: const Icon(Icons.image_not_supported, size: 48),
       );
     } else if (image.startsWith('http')) {
-      headerImage = ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.network(
-          image,
-          width: double.infinity,
-          height: 200,
-          fit: BoxFit.cover,
-          errorBuilder: (c, e, s) => Container(
-            width: double.infinity,
-            height: 200,
-            color: Colors.grey.shade200,
-            alignment: Alignment.center,
-            child: const Icon(Icons.broken_image, size: 48, color: Colors.grey),
-          ),
-        ),
+      headerImage = Image.network(
+        image,
+        width: double.infinity,
+        height: screenHeight * 0.6,
+        fit: BoxFit.cover,
       );
     } else {
-      headerImage = ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset(
-          image,
-          width: double.infinity,
-          height: 200,
-          fit: BoxFit.cover,
-          errorBuilder: (c, e, s) => Container(
-            width: double.infinity,
-            height: 200,
-            color: Colors.grey.shade200,
-            alignment: Alignment.center,
-            child: const Icon(Icons.broken_image, size: 48, color: Colors.grey),
-          ),
-        ),
+      headerImage = Image.asset(
+        image,
+        width: double.infinity,
+        height: screenHeight * 0.6,
+        fit: BoxFit.cover,
       );
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        title: Text(nama, style: const TextStyle(color: Colors.black)),
-        centerTitle: true,
-        leading: Navigator.canPop(context)
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
+      body: Stack(
+        children: [
+          Positioned(top: 0, left: 0, right: 0, child: headerImage),
+
+          Positioned(
+            top: 50,
+            left: 20,
+            child: CircleAvatar(
+              backgroundColor: Colors.black45,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () => Navigator.pop(context),
-              )
-            : null,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Card(
-          elevation: 3,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+              ),
+            ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
+
+          Positioned(
+            top: screenHeight * 0.26,
+            left: 24,
+            right: 24,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                headerImage,
-                const SizedBox(height: 16),
                 Text(
                   nama,
                   style: const TextStyle(
-                    fontSize: 22,
+                    fontSize: 28,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  subJudul,
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-                const Divider(height: 24, color: Colors.grey),
-                Text(
-                  'Deskripsi',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue[900],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  desc,
-                  style: const TextStyle(fontSize: 14, height: 1.5),
-                  textAlign: TextAlign.justify,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Sejarah & Fakta Menarik',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue[900],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  sejarah,
-                  style: const TextStyle(fontSize: 14, height: 1.5),
-                  textAlign: TextAlign.justify,
+                Text(subJudul, style: const TextStyle(color: Colors.white)),
+                const SizedBox(height: 10),
+
+                /// 🔥 AKSI ICON
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      child: LikeButton(),
+                    ),
+                    const SizedBox(width: 5),
+
+                    GestureDetector(
+                      onTap: () {
+                        openKomentarSheet(context, wisataId); // ✅ FIX
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: Icon(Icons.mode_comment, color: Colors.white),
+                      ),
+                    ),
+
+                    const SizedBox(width: 5),
+
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => RatingPopup(),
+                        );
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: Icon(Icons.star, color: Colors.white),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-        ),
+
+          Positioned(
+            top: screenHeight * 0.43,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: const [0.0, 0.10, 1.0],
+                  colors: [
+                    Colors.transparent,
+                    Color(0xFF21899C),
+                    Color(0xFFE6F4F6),
+                  ],
+                ),
+              ),
+
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Deskripsi',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(desc.isNotEmpty ? desc : 'Tidak ada deskripsi.'),
+
+                    const SizedBox(height: 30),
+
+                    const Text(
+                      'Sejarah dan Fakta Menarik',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(sejarah.isNotEmpty ? sejarah : 'Belum ada sejarah.'),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
