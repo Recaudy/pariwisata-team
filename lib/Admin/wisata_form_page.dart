@@ -1,6 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../services/wisata_services.dart';
 import '../models/wisata_model.dart';
+
+const Color primaryColor = Color(0xFF21899C);
 
 class WisataFormPage extends StatefulWidget {
   final WisataModel? wisata;
@@ -13,71 +17,81 @@ class WisataFormPage extends StatefulWidget {
 
 class _WisataFormPageState extends State<WisataFormPage> {
   final WisataService _service = WisataService();
+  final ImagePicker _picker = ImagePicker();
 
-  // ================= CONTROLLERS =================
   final TextEditingController namaController = TextEditingController();
-  final TextEditingController lokasiController = TextEditingController();
-  final TextEditingController deskripsiController = TextEditingController();
-  final TextEditingController descController = TextEditingController();
-  final TextEditingController gambarController = TextEditingController();
-  final TextEditingController imageController = TextEditingController();
-  final TextEditingController kategoriController = TextEditingController();
   final TextEditingController subJudulController = TextEditingController();
+  final TextEditingController descController = TextEditingController();
   final TextEditingController sejarahController = TextEditingController();
+
+  String selectedKategori = 'pantai';
+
+  final Map<String, String> kategoriMap = {
+    'pantai': 'Pantai',
+    'bukit': 'Bukit',
+    'religi': 'Wisata Religi',
+  };
+
+  File? selectedImage;
 
   @override
   void initState() {
     super.initState();
-
-    // JIKA EDIT DATA
     if (widget.wisata != null) {
       namaController.text = widget.wisata!.nama;
-      lokasiController.text = widget.wisata!.lokasi;
-      deskripsiController.text = widget.wisata!.deskripsi;
-      descController.text = widget.wisata!.desc;
-      gambarController.text = widget.wisata!.gambar;
-      imageController.text = widget.wisata!.image;
-      kategoriController.text = widget.wisata!.kategori;
       subJudulController.text = widget.wisata!.subJudul;
+      descController.text = widget.wisata!.desc;
       sejarahController.text = widget.wisata!.sejarah;
+      selectedKategori = widget.wisata!.kategori;
     }
   }
 
   @override
   void dispose() {
     namaController.dispose();
-    lokasiController.dispose();
-    deskripsiController.dispose();
-    descController.dispose();
-    gambarController.dispose();
-    imageController.dispose();
-    kategoriController.dispose();
     subJudulController.dispose();
+    descController.dispose();
     sejarahController.dispose();
     super.dispose();
   }
 
-  // ================= SIMPAN DATA =================
+  Future<void> _pickImage() async {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
+    if (image != null) {
+      setState(() {
+        selectedImage = File(image.path);
+      });
+    }
+  }
+
   void _simpan() async {
+    if (selectedImage == null && widget.wisata == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Silakan pilih gambar')),
+      );
+      return;
+    }
+
     final wisata = WisataModel(
       id: widget.wisata?.id ?? '',
       nama: namaController.text.trim(),
-      lokasi: lokasiController.text.trim(),
-      deskripsi: deskripsiController.text.trim(),
-      desc: descController.text.trim(),
-      gambar: gambarController.text.trim(),
-      image: imageController.text.trim(),
-      kategori: kategoriController.text.trim(),
       subJudul: subJudulController.text.trim(),
+      kategori: selectedKategori,
+      desc: descController.text.trim(),
       sejarah: sejarahController.text.trim(),
+      image: selectedImage?.path ?? widget.wisata!.image,
+      lokasi: '',
+      deskripsi: '',
+      gambar: '',
     );
 
     try {
       if (widget.wisata == null) {
-        // CREATE
         await _service.tambahWisata(wisata);
       } else {
-        // UPDATE
         await _service.updateWisata(wisata);
       }
 
@@ -94,39 +108,95 @@ class _WisataFormPageState extends State<WisataFormPage> {
     }
   }
 
-  // ================= UI =================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.wisata == null ? 'Tambah Wisata' : 'Edit Wisata'),
-        backgroundColor: const Color(0xFF21899C),
+        backgroundColor: primaryColor,
+        elevation: 2,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Column(
           children: [
-            _field(namaController, 'Nama Wisata'),
-            _field(subJudulController, 'Sub Judul'),
-            _field(lokasiController, 'Lokasi'),
-            _field(kategoriController, 'Kategori'),
-            _field(deskripsiController, 'Deskripsi', maxLines: 3),
-            _field(descController, 'Desc (Ringkas)', maxLines: 2),
-            _field(sejarahController, 'Sejarah', maxLines: 4),
-            _field(gambarController, 'Gambar (URL)'),
-            _field(imageController, 'Image (Asset / URL)'),
+            // Card untuk form fields
+            Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    _field(namaController, 'Nama Wisata'),
+                    _field(subJudulController, 'Lokasi'),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: selectedKategori,
+                      decoration: InputDecoration(
+                        labelText: 'Kategori',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                      ),
+                      items: kategoriMap.entries.map((e) {
+                        return DropdownMenuItem(
+                          value: e.key,
+                          child: Text(e.value),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedKategori = value!;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    _field(descController, 'Deskripsi Singkat', maxLines: 3),
+                    _field(sejarahController, 'Sejarah', maxLines: 4),
+                    const SizedBox(height: 12),
+                    // Image Picker
+                    GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        height: 180,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade400),
+                          color: Colors.grey[100],
+                        ),
+                        child: selectedImage != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.file(selectedImage!, fit: BoxFit.cover),
+                              )
+                            : const Center(
+                                child: Icon(Icons.add_a_photo, size: 40, color: Colors.grey),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 24),
+            // Button Save
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _simpan,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF21899C),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: primaryColor,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 3,
                 ),
-                child: const Text(
-                  'Simpan',
-                  style: TextStyle(fontSize: 16),
+                child: Text(
+                  widget.wisata == null ? 'Kirim' : 'Simpan Perubahan',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ),
             ),
@@ -136,7 +206,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
     );
   }
 
-  // ================= WIDGET FIELD =================
   Widget _field(
     TextEditingController controller,
     String label, {
@@ -149,7 +218,9 @@ class _WisataFormPageState extends State<WisataFormPage> {
         maxLines: maxLines,
         decoration: InputDecoration(
           labelText: label,
-          border: const OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
     );

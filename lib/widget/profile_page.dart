@@ -418,9 +418,7 @@ class _InformasiProfilState extends State<InformasiProfil> {
   }
 }
 
-// ------------------------------------------------------------------
-// DUMMY CLASS _ZoomFotoProfil
-// ------------------------------------------------------------------
+
 class _ZoomFotoProfil extends StatelessWidget {
   const _ZoomFotoProfil();
 
