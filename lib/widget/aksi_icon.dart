@@ -21,7 +21,6 @@ void openKomentarSheet(BuildContext context, String wisataId) {
   );
 }
 
-/// ================= KOMENTAR SHEET =================
 class KomentarSheet extends StatefulWidget {
   final String wisataId;
   const KomentarSheet({super.key, required this.wisataId});
@@ -33,22 +32,13 @@ class KomentarSheet extends StatefulWidget {
 class _KomentarSheetState extends State<KomentarSheet> {
   final TextEditingController controller = TextEditingController();
   final user = FirebaseAuth.instance.currentUser;
-
   bool showCustomSnackbar = false;
 
-  @override
-  void initState() {
-    super.initState();
-    debugPrint("WISATA ID DIPAKAI: ${widget.wisataId}");
-  }
-
-  /// 🔥 ambil nama user dari collection users
   Future<String> getNamaUser(String uid) async {
     final doc = await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
         .get();
-
     if (doc.exists && doc.data() != null) {
       return doc['name'] ?? 'User';
     }
@@ -66,7 +56,6 @@ class _KomentarSheetState extends State<KomentarSheet> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        /// ================= TITLE =================
         const Padding(
           padding: EdgeInsets.all(12),
           child: Text(
@@ -74,158 +63,84 @@ class _KomentarSheetState extends State<KomentarSheet> {
             style: TextStyle(color: Colors.white, fontSize: 16),
           ),
         ),
-
-        /// ================= LIST KOMENTAR =================
         Expanded(
-          child: Stack(
-            children: [
-              StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('komentar')
-                    .where('wisataId', isEqualTo: widget.wisataId)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: Colors.white),
-                    );
-                  }
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('komentar')
+                .where('wisataId', isEqualTo: widget.wisataId)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                );
+              }
 
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Center(
-                      child: IgnorePointer(
-                        child: Opacity(
-                          opacity: 0.15,
-                          child: Lottie.asset(
-                            'assets/images/chat.json',
-                            height: 120,
-                            repeat: false,
-                          ),
-                        ),
+              if (snapshot.data!.docs.isEmpty) {
+                return Center(
+                  child: IgnorePointer(
+                    child: Opacity(
+                      opacity: 0.15,
+                      child: Lottie.asset(
+                        'assets/images/chat.json',
+                        height: 120,
+                        repeat: false,
                       ),
-                    );
-                  }
-
-                  final docs = snapshot.data!.docs;
-
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    itemCount: docs.length,
-                    itemBuilder: (context, index) {
-                      final data = docs[index].data() as Map<String, dynamic>;
-
-                      final nama = data['user'] ?? 'User';
-                      final komentar = data['komentar'] ?? '';
-                      final userId = data['userId'];
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CircleAvatar(
-                              radius: 18,
-                              backgroundColor: Colors.white,
-                              child: Text(
-                                nama.isNotEmpty ? nama[0].toUpperCase() : '?',
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          nama,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      PopupMenuButton<String>(
-                                        icon: const Icon(
-                                          Icons.more_vert,
-                                          color: Colors.white,
-                                        ),
-                                        onSelected: (value) async {
-                                          if (value == "hapus" &&
-                                              user != null &&
-                                              user!.uid == userId) {
-                                            await docs[index].reference
-                                                .delete();
-                                          }
-
-                                          if (value == "report") {
-                                            reportKomentar();
-                                          }
-                                        },
-                                        itemBuilder: (_) => const [
-                                          PopupMenuItem(
-                                            value: "hapus",
-                                            child: Text("Hapus"),
-                                          ),
-                                          PopupMenuItem(
-                                            value: "report",
-                                            child: Text("Laporkan"),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade100,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(komentar),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-
-              /// ================= SNACKBAR =================
-              Positioned(
-                bottom: 20,
-                left: 20,
-                right: 20,
-                child: AnimatedOpacity(
-                  opacity: showCustomSnackbar ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 300),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black87,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Text(
-                      "Komentar dilaporkan",
-                      style: TextStyle(color: Colors.white),
                     ),
                   ),
-                ),
-              ),
-            ],
+                );
+              }
+
+              final docs = snapshot.data!.docs;
+
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                itemCount: docs.length,
+                itemBuilder: (context, index) {
+                  final data = docs[index].data() as Map<String, dynamic>;
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Colors.white,
+                          child: Text((data['user'] ?? 'U')[0].toUpperCase()),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                data['user'] ?? 'User',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(data['komentar'] ?? ''),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ),
-
-        /// ================= INPUT KOMENTAR =================
         Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
@@ -272,7 +187,6 @@ class _KomentarSheetState extends State<KomentarSheet> {
   }
 }
 
-/// ================= LIKE BUTTON =================
 class LikeButton extends StatefulWidget {
   @override
   State<LikeButton> createState() => _LikeButtonState();
@@ -284,9 +198,7 @@ class _LikeButtonState extends State<LikeButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        setState(() => isLiked = !isLiked);
-      },
+      onTap: () => setState(() => isLiked = !isLiked),
       child: Icon(
         Icons.favorite,
         color: isLiked ? Colors.red : Colors.white,
@@ -298,14 +210,17 @@ class _LikeButtonState extends State<LikeButton> {
   }
 }
 
-/// ================= RATING POPUP =================
 class RatingPopup extends StatefulWidget {
+  final String wisataId;
+  const RatingPopup({super.key, required this.wisataId});
+
   @override
   State<RatingPopup> createState() => _RatingPopupState();
 }
 
 class _RatingPopupState extends State<RatingPopup> {
   int rating = 0;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -322,9 +237,7 @@ class _RatingPopupState extends State<RatingPopup> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(5, (index) {
               return GestureDetector(
-                onTap: () {
-                  setState(() => rating = index + 1);
-                },
+                onTap: () => setState(() => rating = index + 1),
                 child: Icon(
                   Icons.star,
                   size: 40,
@@ -335,8 +248,39 @@ class _RatingPopupState extends State<RatingPopup> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Kirim"),
+            onPressed: isLoading
+                ? null
+                : () async {
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user == null) return;
+                    if (rating == 0) return;
+
+                    setState(() => isLoading = true);
+
+                    final check = await FirebaseFirestore.instance
+                        .collection('ratings')
+                        .where('wisataId', isEqualTo: widget.wisataId)
+                        .where('userId', isEqualTo: user.uid)
+                        .limit(1)
+                        .get();
+
+                    if (check.docs.isNotEmpty) {
+                      setState(() => isLoading = false);
+                      Navigator.pop(context);
+                      return;
+                    }
+
+                    await FirebaseFirestore.instance.collection('ratings').add({
+                      'wisataId': widget.wisataId,
+                      'userId': user.uid,
+                      'rating': rating,
+                      'createdAt': Timestamp.now(),
+                    });
+
+                    setState(() => isLoading = false);
+                    Navigator.pop(context);
+                  },
+            child: Text(isLoading ? "Loading..." : "Kirim"),
           ),
         ],
       ),

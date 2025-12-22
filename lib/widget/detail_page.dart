@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'aksi_icon.dart';
 
 class DetailPage extends StatelessWidget {
@@ -12,7 +13,7 @@ class DetailPage extends StatelessWidget {
     final image = (wisataData['image'] ?? '').toString();
     final desc = (wisataData['desc'] ?? '').toString();
     final sejarah = (wisataData['sejarah'] ?? '').toString();
-    final wisataId = wisataData['id']; // ✅ AMBIL ID DI SINI
+    final wisataId = wisataData['id'];
 
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -78,18 +79,18 @@ class DetailPage extends StatelessWidget {
                 Text(subJudul, style: const TextStyle(color: Colors.white)),
                 const SizedBox(height: 10),
 
-                /// 🔥 AKSI ICON
                 Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(12),
                       child: LikeButton(),
                     ),
+
                     const SizedBox(width: 5),
 
                     GestureDetector(
                       onTap: () {
-                        openKomentarSheet(context, wisataId); // ✅ FIX
+                        openKomentarSheet(context, wisataId);
                       },
                       child: const Padding(
                         padding: EdgeInsets.all(12),
@@ -103,13 +104,52 @@ class DetailPage extends StatelessWidget {
                       onTap: () {
                         showDialog(
                           context: context,
-                          builder: (_) => RatingPopup(),
+                          builder: (_) => RatingPopup(wisataId: wisataId),
                         );
                       },
                       child: const Padding(
                         padding: EdgeInsets.all(12),
                         child: Icon(Icons.star, color: Colors.white),
                       ),
+                    ),
+
+                    const SizedBox(width: 6),
+
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('ratings')
+                          .where('wisataId', isEqualTo: wisataId)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return const Text(
+                            "0.0",
+                            style: TextStyle(color: Colors.white),
+                          );
+                        }
+
+                        double total = 0;
+                        for (var doc in snapshot.data!.docs) {
+                          total += (doc['rating'] ?? 0).toDouble();
+                        }
+
+                        final avg = total / snapshot.data!.docs.length;
+
+                        return Row(
+                          children: [
+                            const Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 2),
+                            Text(
+                              avg.toStringAsFixed(1),
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -136,7 +176,6 @@ class DetailPage extends StatelessWidget {
                   ],
                 ),
               ),
-
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
