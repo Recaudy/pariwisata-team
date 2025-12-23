@@ -9,4 +9,12 @@ class KomentarService {
         .orderBy('createdAt', descending: true)
         .snapshots();
   }
+  Future<void> deleteKomentar(String docId) async {
+    try {
+      await _firestore.collection('komentar').doc(docId).delete();
+    } catch (e) {
+      throw Exception('Gagal menghapus komentar: $e');
+    }
+  }
+
 }
