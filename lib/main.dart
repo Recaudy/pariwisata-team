@@ -10,8 +10,9 @@ import 'widget/profile_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  print('🔥 Firebase Project ID: ${Firebase.app().options.projectId}');
 
   await Supabase.initialize(
     url: 'https://ntbdymivzfoccbqvzeoe.supabase.co',
@@ -36,9 +37,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/* =======================
-   MAIN SCREEN (BOTTOM BAR)
-   ======================= */
+
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 

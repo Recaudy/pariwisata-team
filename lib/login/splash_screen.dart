@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 
 import 'login_screen.dart';
@@ -33,15 +33,13 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [logo(160, 160), const SizedBox(height: 25), richText(30)],
+         
         ),
       ),
     );
   }
 
-  Widget logo(double height_, double width_) {
-    return SvgPicture.asset('assets/logo.svg', height: height_, width: width_);
-  }
+
 
   Widget richText(double fontSize) {
     return Text.rich(

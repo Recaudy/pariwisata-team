@@ -23,20 +23,11 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -50,20 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyD4CSIlNyBv6-bhXO2XXyXozysBl4sCCLU',
-    appId: '1:3292070646:web:b15c97f2064dacddfd22d7',
-    messagingSenderId: '3292070646',
-    projectId: 'wisata-bangka',
-    authDomain: 'wisata-bangka.firebaseapp.com',
-    storageBucket: 'wisata-bangka.firebasestorage.app',
-    measurementId: 'G-NZY8BNMW5D',
+    apiKey: 'AIzaSyAHUmC7cEbzxurqUXGbuInbeCnQAUBLiX0',
+    appId: '1:51259478934:web:1f5586d49f94a3eb00c3b7',
+    messagingSenderId: '51259478934',
+    projectId: 'wisata-babel',
+    authDomain: 'wisata-babel.firebaseapp.com',
+    storageBucket: 'wisata-babel.firebasestorage.app',
+    measurementId: 'G-FWSTYX9Q0S',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBnIZJhj7T29GQKo9B3PHJut6faueZhm_o',
-    appId: '1:3292070646:android:2c7a59da8a3361b3fd22d7',
-    messagingSenderId: '3292070646',
-    projectId: 'wisata-bangka',
-    storageBucket: 'wisata-bangka.firebasestorage.app',
+    apiKey: 'AIzaSyBnmsN4qIlyRc6ylJlIZgdUrpvbMnSv2mk',
+    appId: '1:51259478934:android:e71a74efc4c50f3200c3b7',
+    messagingSenderId: '51259478934',
+    projectId: 'wisata-babel',
+    storageBucket: 'wisata-babel.firebasestorage.app',
   );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyBuPph0TNvz-2ULikP89Sl8Kbbc7YBp9T0',
+    appId: '1:51259478934:ios:29c9eb70291e69f100c3b7',
+    messagingSenderId: '51259478934',
+    projectId: 'wisata-babel',
+    storageBucket: 'wisata-babel.firebasestorage.app',
+    iosBundleId: 'com.example.projectUtsPariwisata',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyBuPph0TNvz-2ULikP89Sl8Kbbc7YBp9T0',
+    appId: '1:51259478934:ios:29c9eb70291e69f100c3b7',
+    messagingSenderId: '51259478934',
+    projectId: 'wisata-babel',
+    storageBucket: 'wisata-babel.firebasestorage.app',
+    iosBundleId: 'com.example.projectUtsPariwisata',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyAHUmC7cEbzxurqUXGbuInbeCnQAUBLiX0',
+    appId: '1:51259478934:web:683b2f618b61f42500c3b7',
+    messagingSenderId: '51259478934',
+    projectId: 'wisata-babel',
+    authDomain: 'wisata-babel.firebaseapp.com',
+    storageBucket: 'wisata-babel.firebasestorage.app',
+    measurementId: 'G-76TL945VBB',
+  );
+
 }

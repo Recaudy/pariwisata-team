@@ -89,7 +89,7 @@ class AuthService {
         'email': email,
         'role': role,
         'photoUrl': '',
-        'createdAt': FieldValue.serverTimestamp(), // Tambahan untuk tracking
+        'createdAt': FieldValue.serverTimestamp(), 
       });
 
       return null; // Sukses
@@ -100,7 +100,7 @@ class AuthService {
     }
   }
 
-  // --- UPLOAD FOTO KE SUPABASE & LINK KE FIREBASE ---
+
   Future<String?> uploadProfilePicture(String filePath) async {
     try {
       fb.User? user = _auth.currentUser;
@@ -134,7 +134,7 @@ class AuthService {
     }
   }
 
-  // --- UPDATE NAMA ---
+
   Future<String?> updateUserName(String newName) async {
     try {
       final user = _auth.currentUser;
@@ -149,7 +149,7 @@ class AuthService {
     }
   }
 
-  // --- UPDATE PASSWORD ---
+
   Future<String?> updatePassword(String newPassword) async {
     try {
       final user = _auth.currentUser;
@@ -165,7 +165,7 @@ class AuthService {
     }
   }
 
-  // --- LOGOUT ---
+
   Future<void> signOut() async {
     await _auth.signOut();
   }
