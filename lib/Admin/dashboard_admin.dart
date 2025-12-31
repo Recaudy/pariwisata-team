@@ -37,29 +37,25 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   void _showLogoutDialog() {
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Konfirmasi Logout"),
-          content: const Text("Yakin ingin logout?"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Batal"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamedAndRemoveUntil(
-                    context, '/', (route) => false);
-              },
-              child: const Text(
-                "Logout",
-                style: TextStyle(color: Colors.red),
-              ),
-            ),
-          ],
-        );
-      },
+      builder: (_) => AlertDialog(
+        title: const Text("Konfirmasi Logout"),
+        content: const Text("Apakah Anda yakin ingin logout?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/', (route) => false);
+            },
+            child: const Text("Logout",
+                style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -67,9 +63,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF4F6FA),
+
       appBar: AppBar(
-        title: const Text("Dashboard Admin"),
+        elevation: 0,
         backgroundColor: primaryColor,
+        title: const Text("Dashboard Admin"),
       ),
 
       drawer: Drawer(
@@ -82,10 +81,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 child: Text(
                   "Admin",
                   style: TextStyle(
-                    fontSize: 22,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -108,7 +106,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             ),
             const Spacer(),
             ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
+              leading:
+                  const Icon(Icons.logout, color: Colors.red),
               title: const Text("Logout"),
               onTap: _showLogoutDialog,
             ),
@@ -122,12 +121,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const WisataFormPage()),
+            MaterialPageRoute(
+                builder: (_) => const WisataFormPage()),
           );
         },
       ),
 
-      // ================= BODY =================
       body: StreamBuilder<List<WisataModel>>(
         stream: _wisataService.getWisata(),
         builder: (context, snapshot) {
@@ -149,92 +148,55 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
-                // ================= WELCOME =================
-                const Text(
-                  "Selamat Datang, Admin 👋",
-                  style: TextStyle(
-                      fontSize: 22, fontWeight: FontWeight.bold),
+                // ================= HEADER DASHBOARD =================
+                StreamBuilder<QuerySnapshot>(
+                  stream: _komentarService.getKomentar(),
+                  builder: (context, komentarSnap) {
+                    int totalUlasan = komentarSnap.hasData
+                        ? komentarSnap.data!.docs.length
+                        : 0;
+
+                    return StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('ratings')
+                          .snapshots(),
+                      builder: (context, ratingSnap) {
+                        double avgRating = 0;
+                        if (ratingSnap.hasData &&
+                            ratingSnap.data!.docs.isNotEmpty) {
+                          final ratings = ratingSnap.data!.docs
+                              .map((e) =>
+                                  (e.data() as Map<String, dynamic>)['rating']
+                                      as int)
+                              .toList();
+                          avgRating =
+                              ratings.reduce((a, b) => a + b) /
+                                  ratings.length;
+                        }
+
+                        return dashboardHeader(
+                          totalWisata: wisataList.length,
+                          totalUlasan: totalUlasan,
+                          rating: avgRating,
+                        );
+                      },
+                    );
+                  },
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
-                // ================= STATISTIK =================
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Statistik Aplikasi",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 16),
-
-                      Row(
-                        children: [
-                          simpleStatItem(
-                            icon: Icons.place,
-                            title: "Total Wisata",
-                            value: wisataList.length.toString(),
-                          ),
-                          const SizedBox(width: 8),
-
-                          StreamBuilder<QuerySnapshot>(
-                            stream: _komentarService.getKomentar(),
-                            builder: (context, snap) {
-                              int total = snap.hasData
-                                  ? snap.data!.docs.length
-                                  : 0;
-                              return simpleStatItem(
-                                icon: Icons.comment,
-                                title: "Total Ulasan",
-                                value: total.toString(),
-                              );
-                            },
-                          ),
-                          const SizedBox(width: 8),
-
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('ratings')
-                                .snapshots(),
-                            builder: (context, snap) {
-                              double avg = 0;
-                              if (snap.hasData &&
-                                  snap.data!.docs.isNotEmpty) {
-                                final ratings = snap.data!.docs
-                                    .map((doc) =>
-                                        (doc.data() as Map<String, dynamic>)['rating']
-                                            as int)
-                                    .toList();
-                                avg = ratings.reduce((a, b) => a + b) /
-                                    ratings.length;
-                              }
-                              return simpleStatItem(
-                                icon: Icons.star,
-                                title: "Rating",
-                                value: avg.toStringAsFixed(1),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+                // ================= QUICK MENU =================
+                quickMenu(context),
 
                 const SizedBox(height: 32),
 
                 // ================= ULASAN TERBARU =================
                 const Text(
                   "Ulasan Terbaru",
-                  style:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
 
@@ -245,10 +207,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
                     final now = DateTime.now();
                     final recent = snapshot.data!.docs.where((doc) {
-                      final data = doc.data() as Map<String, dynamic>;
+                      final data =
+                          doc.data() as Map<String, dynamic>;
                       final time = data['createdAt'] as Timestamp?;
                       if (time == null) return false;
-                      return now.difference(time.toDate()).inHours <= 24;
+                      return now
+                              .difference(time.toDate())
+                              .inHours <=
+                          24;
                     }).toList();
 
                     final display = recent.length > maxItems
@@ -258,11 +224,20 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     return Column(
                       children: [
                         for (var doc in display)
-                          Card(
+                          Container(
+                            margin:
+                                const EdgeInsets.only(bottom: 8),
+                            decoration: cardDecoration(),
                             child: ListTile(
-                              leading: const Icon(Icons.person),
-                              title: Text(doc['user'] ?? 'Anonim'),
-                              subtitle: Text(doc['komentar'] ?? ''),
+                              leading: const CircleAvatar(
+                                backgroundColor: primaryColor,
+                                child: Icon(Icons.person,
+                                    color: Colors.white),
+                              ),
+                              title:
+                                  Text(doc['user'] ?? 'Anonim'),
+                              subtitle:
+                                  Text(doc['komentar'] ?? ''),
                             ),
                           ),
                         if (recent.length > maxItems)
@@ -271,8 +246,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) =>
-                                      KomentarPage(wisataList: wisataList),
+                                  builder: (_) => KomentarPage(
+                                      wisataList: wisataList),
                                 ),
                               );
                             },
@@ -288,19 +263,20 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 // ================= FILTER =================
                 const Text(
                   "Filter Wisata",
-                  style:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
                 ),
+                const SizedBox(height: 8),
 
                 DropdownButton<String>(
                   value: selectedKategori,
+                  isExpanded: true,
                   items: kategoriMap.entries
-                      .map(
-                        (e) => DropdownMenuItem(
-                          value: e.key,
-                          child: Text(e.value),
-                        ),
-                      )
+                      .map((e) => DropdownMenuItem(
+                            value: e.key,
+                            child: Text(e.value),
+                          ))
                       .toList(),
                   onChanged: (value) {
                     setState(() {
@@ -313,7 +289,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
                 // ================= LIST WISATA =================
                 for (var w in displayWisata)
-                  Card(
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: cardDecoration(),
                     child: ListTile(
                       title: Text(w.nama,
                           style: const TextStyle(
@@ -323,7 +301,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            icon: const Icon(Icons.edit,
+                                color: Colors.blue),
                             onPressed: () {
                               Navigator.push(
                                 context,
@@ -335,10 +314,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                             },
                           ),
                           IconButton(
-                            icon:
-                                const Icon(Icons.delete, color: Colors.red),
+                            icon: const Icon(Icons.delete,
+                                color: Colors.red),
                             onPressed: () async {
-                              await _wisataService.deleteWisata(w.id);
+                              await _wisataService
+                                  .deleteWisata(w.id);
                             },
                           ),
                         ],
@@ -368,7 +348,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         },
       ),
 
-      // ================= BOTTOM NAV =================
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         selectedItemColor: primaryColor,
@@ -377,7 +356,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         },
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard), label: "Dashboard"),
+              icon: Icon(Icons.dashboard),
+              label: "Dashboard"),
           BottomNavigationBarItem(
               icon: Icon(Icons.place), label: "Wisata"),
           BottomNavigationBarItem(
@@ -388,35 +368,146 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 }
 
-// ================= STAT ITEM =================
-Widget simpleStatItem({
-  required IconData icon,
-  required String title,
-  required String value,
+/* ===========================================================
+   WIDGET & STYLE
+   =========================================================== */
+
+Widget dashboardHeader({
+  required int totalWisata,
+  required int totalUlasan,
+  required double rating,
 }) {
+  return Container(
+    padding: const EdgeInsets.all(20),
+    decoration: BoxDecoration(
+      gradient: const LinearGradient(
+        colors: [Color(0xFF4B6CB7), Color(0xFF182848)],
+      ),
+      borderRadius: BorderRadius.circular(24),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.15),
+          blurRadius: 12,
+          offset: const Offset(0, 6),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Dashboard Admin",
+          style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            headerStat(Icons.place, "Wisata", totalWisata.toString()),
+            const SizedBox(width: 12),
+            headerStat(Icons.comment, "Ulasan", totalUlasan.toString()),
+            const SizedBox(width: 12),
+            headerStat(Icons.star, "Rating", rating.toStringAsFixed(1)),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+Widget headerStat(IconData icon, String label, String value) {
   return Expanded(
     child: Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
-          Icon(icon, color: primaryColor),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style:
-                const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
-            textAlign: TextAlign.center,
-          ),
+          Icon(icon, color: Colors.white),
+          const SizedBox(height: 8),
+          Text(value,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18)),
+          Text(label,
+              style:
+                  const TextStyle(color: Colors.white70, fontSize: 12)),
         ],
       ),
     ),
+  );
+}
+
+Widget quickMenu(BuildContext context) {
+  return Row(
+    children: [
+      quickMenuItem(
+        icon: Icons.place,
+        label: "Kelola Wisata",
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => const WisataFormPage()),
+          );
+        },
+      ),
+      const SizedBox(width: 12),
+      quickMenuItem(
+        icon: Icons.comment,
+        label: "Ulasan",
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => KomentarPage(wisataList: const []),
+            ),
+          );
+        },
+      ),
+    ],
+  );
+}
+
+Widget quickMenuItem({
+  required IconData icon,
+  required String label,
+  required VoidCallback onTap,
+}) {
+  return Expanded(
+    child: InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: cardDecoration(),
+        child: Column(
+          children: [
+            Icon(icon, color: primaryColor, size: 28),
+            const SizedBox(height: 8),
+            Text(label,
+                style:
+                    const TextStyle(fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+BoxDecoration cardDecoration() {
+  return BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(18),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.08),
+        blurRadius: 10,
+      ),
+    ],
   );
 }
