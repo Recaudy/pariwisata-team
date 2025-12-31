@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:project_uts_pariwisata/Admin/profil_admin_page.dart';
 
 import '../services/wisata_services.dart';
 import '../models/wisata_model.dart';
@@ -348,29 +349,56 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         },
       ),
 
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        selectedItemColor: primaryColor,
-        onTap: (index) {
-          setState(() => _selectedIndex = index);
-        },
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard),
-              label: "Dashboard"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.place), label: "Wisata"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person), label: "Profil"),
-        ],
-      ),
+bottomNavigationBar: BottomNavigationBar(
+  selectedItemColor: primaryColor,
+  items: const [
+    BottomNavigationBarItem(
+      icon: Icon(Icons.dashboard),
+      label: "Dashboard",
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.place),
+      label: "Wisata",
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.person),
+      label: "Profil",
+    ),
+  ],
+  onTap: (index) {
+    if (index == 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const AdminDashboardPage(),
+        ),
+      );
+    } else if (index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const WisataListPage(
+            kategori: 'all',
+            kategoriName: 'Semua Wisata',
+          ),
+        ),
+      );
+    } else if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const InformasiProfilAdmin(), // ganti sesuai punyamu
+        ),
+      );
+    }
+  },
+),
+
     );
   }
 }
 
-/* ===========================================================
-   WIDGET & STYLE
-   =========================================================== */
+
 
 Widget dashboardHeader({
   required int totalWisata,

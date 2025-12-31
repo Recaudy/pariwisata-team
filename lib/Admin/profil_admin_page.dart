@@ -1,50 +1,91 @@
-// screens/admin_profil_page.dart
-
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
-// WARNA UTAMA
+import '../models/user_model.dart';
+import '../services/auth_service.dart';
+
 const Color primaryColor = Color(0xFF21899C);
 
-// Dummy AdminModel untuk contoh UI
-class AdminModel {
-  final String name;
-  final String email;
-  final String? photoUrl;
+class InformasiProfilAdmin extends StatefulWidget {
+  const InformasiProfilAdmin({super.key});
 
-  AdminModel({required this.name, required this.email, this.photoUrl});
+  @override
+  State<InformasiProfilAdmin> createState() => _InformasiProfilAdminState();
 }
 
-class AdminProfilPage extends StatelessWidget {
-  final AdminModel admin;
+class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
+  final AuthService _authService = AuthService();
 
-  const AdminProfilPage({super.key, required this.admin});
+  UserModel? admin;
+  bool isLoading = true;
+
+  File? _newProfileImageFile;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAdmin();
+  }
+
+  Future<void> _loadAdmin() async {
+    final user = await _authService.getCurrentUserData();
+
+    setState(() {
+      admin = user;
+      isLoading = false;
+    });
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+
+    if (picked != null) {
+      setState(() {
+        _newProfileImageFile = File(picked.path);
+      });
+
+      await _authService.uploadProfilePicture(picked.path);
+      await _loadAdmin(); // refresh data
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (admin == null) {
+      return const Scaffold(
+        body: Center(child: Text("Admin tidak ditemukan")),
+      );
+    }
+
     ImageProvider profileImage;
-    if (admin.photoUrl != null && admin.photoUrl!.isNotEmpty) {
-      profileImage = NetworkImage(admin.photoUrl!);
+    if (_newProfileImageFile != null) {
+      profileImage = FileImage(_newProfileImageFile!);
+    } else if (admin!.photoUrl != null && admin!.photoUrl!.isNotEmpty) {
+      profileImage = NetworkImage(admin!.photoUrl!);
     } else {
       profileImage = const AssetImage("assets/images/profil.jpg");
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          "Profil Admin",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text("Profil Admin"),
         centerTitle: true,
         backgroundColor: primaryColor,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // FOTO PROFIL
-            Hero(
-              tag: 'foto-profil-admin',
+            GestureDetector(
+              onTap: _pickImage,
               child: CircleAvatar(
                 radius: 60,
                 backgroundImage: profileImage,
@@ -52,38 +93,34 @@ class AdminProfilPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // NAMA ADMIN
             Text(
-              admin.name,
+              admin!.name,
               style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
+
             Text(
-              "Admin",
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
+              admin!.email,
+              style: const TextStyle(color: Colors.grey),
             ),
+
             const SizedBox(height: 30),
 
-            // FIELD NAMA
-            _buildStaticField(icon: Icons.person, label: "Nama", value: admin.name),
-            const SizedBox(height: 20),
-
-            // FIELD EMAIL
-            _buildStaticField(icon: Icons.email, label: "Email", value: admin.email),
+            _buildInfoTile(Icons.person, "Nama", admin!.name),
+            const SizedBox(height: 16),
+            _buildInfoTile(Icons.email, "Email", admin!.email),
+            const SizedBox(height: 16),
+            _buildInfoTile(Icons.security, "Role", admin!.role),
           ],
         ),
       ),
     );
   }
 
-  // Widget statis untuk field
-  Widget _buildStaticField({required IconData icon, required String label, required String value}) {
+  Widget _buildInfoTile(IconData icon, String label, String value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       decoration: BoxDecoration(
@@ -93,20 +130,14 @@ class AdminProfilPage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey, size: 22),
+          Icon(icon, color: primaryColor),
           const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
-              ),
+              Text(label, style: const TextStyle(color: Colors.grey)),
               const SizedBox(height: 4),
-              Text(
-                value,
-                style: const TextStyle(fontSize: 16, color: Colors.black87),
-              ),
+              Text(value, style: const TextStyle(fontSize: 16)),
             ],
           ),
         ],
