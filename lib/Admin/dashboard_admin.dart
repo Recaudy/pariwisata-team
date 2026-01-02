@@ -8,7 +8,11 @@ import 'wisata_form_page.dart';
 import 'Komentar_page.dart';
 import 'wisata_list_page.dart';
 
+/* ===== WARNA TEMA (4 WARNA SAJA) ===== */
 const Color primaryColor = Color(0xFF21899C);
+const Color secondaryColor = Color(0xFF176B78);
+const Color accentColor = Color(0xFFFFC107);
+const Color backgroundColor = Color(0xFFF2F5F7);
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
@@ -20,11 +24,6 @@ class AdminDashboardPage extends StatefulWidget {
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
   final WisataService _wisataService = WisataService();
   final KomentarService _komentarService = KomentarService();
-
-  String selectedKategori = 'all';
-  int maxItems = 2;
-  int _selectedIndex = 0;
-
 
   void _showLogoutDialog() {
     showDialog(
@@ -42,7 +41,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               Navigator.pop(context);
               Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
             },
-            child: const Text("Logout", style: TextStyle(color: Colors.red)),
+            child: const Text(
+              "Logout",
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -52,38 +54,54 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FA),
-
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: primaryColor,
-        title: const Text("Dashboard Admin"),
+        backgroundColor: secondaryColor,
+        title: const Text(
+          "Dashboard Admin",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
 
+      /* ===== DRAWER ===== */
       drawer: Drawer(
         child: Column(
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: primaryColor),
-              child: Align(
-                alignment: Alignment.bottomLeft,
-                child: Text(
-                  "Admin",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+            Container(
+              height: 200,
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: secondaryColor,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: const [
+                  CircleAvatar(
+                    radius: 36,
+                    backgroundImage: AssetImage("assets/images/profil.jpg"),
                   ),
-                ),
+                  SizedBox(height: 12),
+                  Text(
+                    "Admin",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
+
             ListTile(
-              leading: const Icon(Icons.dashboard),
+              leading: Icon(Icons.dashboard, color: primaryColor),
               title: const Text("Dashboard"),
               onTap: () => Navigator.pop(context),
             ),
             ListTile(
-              leading: const Icon(Icons.place),
+              leading: Icon(Icons.place, color: primaryColor),
               title: const Text("Kelola Wisata"),
               onTap: () {
                 Navigator.pop(context);
@@ -108,9 +126,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         ),
       ),
 
+      /* ===== FAB ===== */
       floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        child: const Icon(Icons.add),
+        backgroundColor: accentColor,
+        child: const Icon(Icons.add, color: Colors.black),
         onPressed: () {
           Navigator.push(
             context,
@@ -119,33 +138,21 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         },
       ),
 
+      /* ===== BODY ===== */
       body: StreamBuilder<List<WisataModel>>(
         stream: _wisataService.getWisata(),
         builder: (context, snapshot) {
           final wisataList = snapshot.data ?? [];
 
-          final filteredWisata = selectedKategori == 'all'
-              ? wisataList
-              : wisataList
-                    .where((w) => w.kategori == selectedKategori)
-                    .toList();
-
-          final displayWisata = filteredWisata.length > maxItems
-              ? filteredWisata.sublist(0, maxItems)
-              : filteredWisata;
-
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ================= HEADER DASHBOARD =================
                 StreamBuilder<QuerySnapshot>(
                   stream: _komentarService.getKomentar(),
                   builder: (context, komentarSnap) {
-                    int totalUlasan = komentarSnap.hasData
-                        ? komentarSnap.data!.docs.length
-                        : 0;
+                    int totalUlasan =
+                        komentarSnap.hasData ? komentarSnap.data!.docs.length : 0;
 
                     return StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
@@ -156,11 +163,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         if (ratingSnap.hasData &&
                             ratingSnap.data!.docs.isNotEmpty) {
                           final ratings = ratingSnap.data!.docs
-                              .map(
-                                (e) =>
-                                    (e.data() as Map<String, dynamic>)['rating']
-                                        as int,
-                              )
+                              .map((e) =>
+                                  (e.data() as Map<String, dynamic>)['rating'] as int)
                               .toList();
                           avgRating =
                               ratings.reduce((a, b) => a + b) / ratings.length;
@@ -178,31 +182,24 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
                 const SizedBox(height: 24),
                 quickMenu(context),
-
-                
               ],
             ),
           );
         },
       ),
 
+      /* ===== BOTTOM NAV ===== */
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: primaryColor,
+        unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.white,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: "Dashboard",
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Dashboard"),
           BottomNavigationBarItem(icon: Icon(Icons.place), label: "Wisata"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profil"),
         ],
         onTap: (index) {
-          if (index == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AdminDashboardPage()),
-            );
-          } else if (index == 1) {
+          if (index == 1) {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -216,8 +213,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) =>
-                    const InformasiProfilAdmin(), // ganti sesuai punyamu
+                builder: (_) => const InformasiProfilAdmin(),
               ),
             );
           }
@@ -227,6 +223,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 }
 
+/* ===== WIDGET BAWAH ===== */
+
 Widget dashboardHeader({
   required int totalWisata,
   required int totalUlasan,
@@ -235,26 +233,17 @@ Widget dashboardHeader({
   return Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        colors: [Color(0xFF4B6CB7), Color(0xFF182848)],
-      ),
+      color: secondaryColor,
       borderRadius: BorderRadius.circular(24),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.15),
-          blurRadius: 12,
-          offset: const Offset(0, 6),
-        ),
-      ],
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Dashboard Admin",
+          "Statistik",
           style: TextStyle(
             color: Colors.white,
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -262,9 +251,7 @@ Widget dashboardHeader({
         Row(
           children: [
             headerStat(Icons.place, "Wisata", totalWisata.toString()),
-            const SizedBox(width: 12),
             headerStat(Icons.comment, "Ulasan", totalUlasan.toString()),
-            const SizedBox(width: 12),
             headerStat(Icons.star, "Rating", rating.toStringAsFixed(1)),
           ],
         ),
@@ -275,30 +262,20 @@ Widget dashboardHeader({
 
 Widget headerStat(IconData icon, String label, String value) {
   return Expanded(
-    child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: Colors.white),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
+    child: Column(
+      children: [
+        Icon(icon, color: accentColor, size: 28),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
           ),
-          Text(
-            label,
-            style: const TextStyle(color: Colors.white70, fontSize: 12),
-          ),
-        ],
-      ),
+        ),
+        Text(label, style: const TextStyle(color: Colors.white70)),
+      ],
     ),
   );
 }
@@ -348,25 +325,28 @@ Widget quickMenuItem({
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: cardDecoration(),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
         child: Column(
           children: [
             Icon(icon, color: primaryColor, size: 28),
             const SizedBox(height: 8),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+            Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
           ],
         ),
       ),
     ),
-  );
-}
-
-BoxDecoration cardDecoration() {
-  return BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(18),
-    boxShadow: [
-      BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 10),
-    ],
   );
 }
