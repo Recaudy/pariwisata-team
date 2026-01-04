@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:project_uts_pariwisata/Admin/profil_admin_page.dart';
 import '../services/wisata_services.dart';
 import '../models/wisata_model.dart';
 import '../services/komentar_service.dart';
 import 'wisata_form_page.dart';
-import 'Ratinglist_page.dart';
 import 'Komentar_page.dart';
 import 'wisata_list_page.dart';
+import 'ratinglist_page.dart'; // Import halaman rating
 
-const Color primaryColor = Color(0xFF21899C);
+// TEMA WARNA (Tetap Konsisten)
+class AppColors {
+  static const Color primary = Color(0xFF21899C); // Teal Tua
+  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
+  static const Color accent = Color(0xFFF56B3F); // Oranye
+  static const Color highlight = Color(0xFFF9CA58); // Kuning
+}
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
@@ -18,33 +26,26 @@ class AdminDashboardPage extends StatefulWidget {
 }
 
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
-  final WisataService _service = WisataService();
+  final WisataService _wisataService = WisataService();
   final KomentarService _komentarService = KomentarService();
-  String selectedKategori = 'all';
-  int _selectedIndex = 0;
-  final int maxItems = 2;
-
-  final Map<String, String> kategoriMap = {
-    'all': 'Semua Wisata',
-    'pantai': 'Pantai',
-    'bukit': 'Bukit',
-    'religi': 'Wisata Religi',
-  };
 
   void _showLogoutDialog() {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Konfirmasi Logout'),
-        content: const Text('Apakah anda yakin ingin logout?'),
+        title: const Text("Konfirmasi Logout"),
+        content: const Text("Apakah Anda yakin ingin logout?"),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal"),
+          ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
             },
-            child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            child: const Text("Logout", style: TextStyle(color: Color(0xFF21899C))),
           ),
         ],
       ),
@@ -53,377 +54,458 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
+      backgroundColor: const Color(0xFFF2F5F7),
       appBar: AppBar(
-        title: const Text("Dashboard Admin"),
-        backgroundColor: primaryColor,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {},
-          ),
-        ],
+        elevation: 0,
+        backgroundColor: AppColors.primary,
       ),
+
+      /* ===== DRAWER (WIDGET DASAR DISESUAIKAN) ===== */
       drawer: Drawer(
-        child: Column(
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: primaryColor),
-              child: Align(
-                alignment: Alignment.bottomLeft,
-                child: Text(
-                  'Admin',
-                  style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+        child: Container(
+          color: Colors.white, // Latar belakang drawer putih agar bersih
+          child: Column(
+            children: [
+              // HEADER DRAWER DISESUAIKAN
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.only(
+                  top: 60,
+                  bottom: 30,
+                  left: 20,
+                  right: 20,
                 ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.dashboard),
-              title: const Text('Dashboard'),
-              onTap: () => Navigator.pop(context),
-            ),
-            ListTile(
-              leading: const Icon(Icons.place),
-              title: const Text('Kelola Wisata'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const WisataFormPage()));
-              },
-            ),
-            const Spacer(),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('Logout'),
-              onTap: _showLogoutDialog,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        child: const Icon(Icons.add),
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const WisataFormPage()),
-        ),
-      ),
-      body: StreamBuilder<List<WisataModel>>(
-        stream: _service.getWisata(),
-        builder: (context, snapshotWisata) {
-          final wisataList = snapshotWisata.data ?? [];
-          final filteredWisata = selectedKategori == 'all'
-              ? wisataList
-              : wisataList.where((w) => w.kategori == selectedKategori).toList();
-          final displayWisata = filteredWisata.length > maxItems
-              ? filteredWisata.sublist(0, maxItems)
-              : filteredWisata;
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Selamat datang, Admin!",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 16),
-
-                // ===== Statistik Grid =====
-                LayoutBuilder(builder: (context, constraints) {
-                  int gridCount = screenWidth > 600 ? 3 : 1;
-                  return GridView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: gridCount, mainAxisSpacing: 16, crossAxisSpacing: 16, childAspectRatio: 3),
-                    children: [
-                      _statCard("Total Wisata", wisataList.length.toString(), Icons.place),
-                      StreamBuilder<QuerySnapshot>(
-                        stream: _komentarService.getKomentar(),
-                        builder: (context, snapshotKomentar) {
-                          final totalKomentar =
-                              snapshotKomentar.hasData ? snapshotKomentar.data!.docs.length : 0;
-                          return _statCard("Total Ulasan", totalKomentar.toString(), Icons.comment);
-                        },
-                      ),
-                      StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance.collection('ratings').snapshots(),
-                        builder: (context, snapshotRating) {
-                          if (!snapshotRating.hasData) return _statCard("Rating", "0", Icons.star);
-                          final ratingDocs = snapshotRating.data!.docs;
-                          double avgRating = 0;
-                          if (ratingDocs.isNotEmpty) {
-                            final ratings = ratingDocs
-                                .map((doc) => (doc.data() as Map<String, dynamic>)['rating'] as int)
-                                .toList();
-                            avgRating = ratings.reduce((a, b) => a + b) / ratings.length;
-                          }
-                          return _statCard("Rata-rata Rating", avgRating.toStringAsFixed(1), Icons.star);
-                        },
-                      ),
-                    ],
-                  );
-                }),
-
-                const SizedBox(height: 32),
-
-                // ===== Horizontal List Pantai =====
-                const Text(
-                  "Pantai dengan Ulasan & Rating",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 250,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: wisataList.length,
-                    itemBuilder: (context, index) {
-                      final wisata = wisataList[index];
-                      if (wisata.kategori != 'pantai') return const SizedBox();
-                      return Container(
-                        width: 180,
-                        margin: const EdgeInsets.only(right: 12),
-                        child: Card(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          elevation: 3,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (wisata.gambar.isNotEmpty)
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(12), topRight: Radius.circular(12)),
-                                  child: Image.asset(
-                                    'assets/images/${wisata.gambar}',
-                                    height: 120,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              Padding(
-                                padding: const EdgeInsets.all(8),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(wisata.nama,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold, fontSize: 16),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis),
-                                    const SizedBox(height: 4),
-                                    Text(wisata.deskripsi,
-                                        style:
-                                            const TextStyle(fontSize: 12, color: Colors.grey),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis),
-                                    const SizedBox(height: 8),
-                                    StreamBuilder<QuerySnapshot>(
-                                      stream: FirebaseFirestore.instance
-                                          .collection('ratings')
-                                          .where('wisataId', isEqualTo: wisata.id)
-                                          .snapshots(),
-                                      builder: (context, snapshotRating) {
-                                        if (!snapshotRating.hasData ||
-                                            snapshotRating.data!.docs.isEmpty) {
-                                          return const Text("Belum ada rating",
-                                              style: TextStyle(fontSize: 12));
-                                        }
-                                        final ratings = snapshotRating.data!.docs
-                                            .map((doc) =>
-                                                (doc.data() as Map<String, dynamic>)['rating']
-                                                    as int)
-                                            .toList();
-                                        double avg = ratings.isNotEmpty
-                                            ? ratings.reduce((a, b) => a + b) / ratings.length
-                                            : 0;
-                                        return Row(
-                                          children: [
-                                            const Icon(Icons.star,
-                                                color: Colors.orange, size: 16),
-                                            const SizedBox(width: 4),
-                                            Text(avg.toStringAsFixed(1),
-                                                style: const TextStyle(fontSize: 12)),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
                   ),
                 ),
-
-                const SizedBox(height: 32),
-
-                // ===== Ulasan Terbaru =====
-                const Text("Ulasan Terbaru",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                StreamBuilder<QuerySnapshot>(
-                  stream: _komentarService.getKomentar(),
-                  builder: (context, snapshotKomentar) {
-                    if (!snapshotKomentar.hasData) return const SizedBox();
-                    final now = DateTime.now().toUtc();
-                    final recent = snapshotKomentar.data!.docs.where((doc) {
-                      final data = doc.data() as Map<String, dynamic>;
-                      final createdAt = data['createdAt'] as Timestamp?;
-                      if (createdAt == null) return false;
-                      return now.difference(createdAt.toDate().toUtc()).inHours <= 24;
-                    }).toList();
-                    final displayRecent =
-                        recent.length > maxItems ? recent.sublist(0, maxItems) : recent;
-                    return Column(
-                      children: [
-                        for (var doc in displayRecent)
-                          Card(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            child: ListTile(
-                              leading: const Icon(Icons.person),
-                              title: Text(
-                                  (doc.data() as Map<String, dynamic>)['user'] ?? 'Anonim'),
-                              subtitle: Text(
-                                  (doc.data() as Map<String, dynamic>)['komentar'] ?? ''),
-                              trailing: const Icon(Icons.notifications_active,
-                                  color: Colors.orange),
-                            ),
-                          ),
-                        if (recent.length > maxItems)
-                          TextButton(
-                              onPressed: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => KomentarPage(
-                                          wisataList: wisataList))),
-                              child: const Text("Lihat Selengkapnya")),
-                      ],
-                    );
-                  },
-                ),
-
-                const SizedBox(height: 32),
-
-                // ===== Dropdown Kategori & List Wisata =====
-                const Text("Cari Kategori Wisata",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                DropdownButton<String>(
-                  value: selectedKategori,
-                  items: kategoriMap.entries
-                      .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedKategori = value!;
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  kategoriMap[selectedKategori]!,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: displayWisata.length,
-                  itemBuilder: (context, index) {
-                    final w = displayWisata[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      child: ListTile(
-                        title: Text(w.nama,
-                            style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(w.lokasi),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit, color: Colors.blue),
-                              onPressed: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => WisataFormPage(wisata: w)),
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () async => await _service.deleteWisata(w.id),
-                            ),
-                          ],
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: const BoxDecoration(
+                          color: AppColors.highlight,
+                          shape: BoxShape.circle,
                         ),
-                      ),
-                    );
-                  },
-                ),
-                if (filteredWisata.length > maxItems)
-                  TextButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => WisataListPage(
-                          kategori: selectedKategori,
-                          kategoriName: kategoriMap[selectedKategori]!,
+                        child: const CircleAvatar(
+                          radius: 40,
+                          backgroundImage: AssetImage(
+                            "assets/images/profil.jpg",
+                          ),
                         ),
                       ),
                     ),
-                    child: const Text("Lihat Selengkapnya"),
+                    const SizedBox(height: 15),
+                    Center(
+                      child: Text(
+                        "Admin",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // ITEM MENU DRAWER
+              ListTile(
+                leading: const Icon(
+                  Icons.dashboard_rounded,
+                  color: AppColors.primary,
+                ),
+                title: Text(
+                  "Kelola Wisata",
+                  style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                ),
+                  onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const WisataListPage(
+                        kategori: 'all',
+                        kategoriName: 'Semua Wisata',
+                      ),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.map_rounded,
+                  color: AppColors.primary,
+                ),
+                title: Text(
+                  "Profil",
+                  style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const InformasiProfilAdmin(
+
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const Divider(indent: 20, endIndent: 20),
+
+              // TOMBOL LOGOUT DI BAWAH
+              const Spacer(),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
                   ),
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.logout_rounded,
+                      color: Color(0xFF21899C),
+                    ),
+                    title: Text(
+                      "Logout",
+                      style: GoogleFonts.inter(
+                        color: Color(0xFF21899C),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onTap: _showLogoutDialog,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.accent,
+        child: const Icon(Icons.add, color: Colors.white),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const WisataFormPage()),
+          );
+        },
+      ),
+
+      body: StreamBuilder<List<WisataModel>>(
+        stream: _wisataService.getWisata(),
+        builder: (context, snapshot) {
+          final wisataList = snapshot.data ?? [];
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Statistik Hari Ini",
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                // BOX STATISTIK DENGAN 3 AREA KLIK TERPISAH
+                StreamBuilder<QuerySnapshot>(
+                  stream: _komentarService.getKomentar(),
+                  builder: (context, komentarSnap) {
+                    int totalUlasan = komentarSnap.hasData
+                        ? komentarSnap.data!.docs.length
+                        : 0;
+
+                    return StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('ratings')
+                          .snapshots(),
+                      builder: (context, ratingSnap) {
+                        double avgRating = 0;
+                        if (ratingSnap.hasData &&
+                            ratingSnap.data!.docs.isNotEmpty) {
+                          final ratings = ratingSnap.data!.docs
+                              .map(
+                                (e) =>
+                                    (e.data() as Map<String, dynamic>)['rating']
+                                        as int,
+                              )
+                              .toList();
+                          avgRating =
+                              ratings.reduce((a, b) => a + b) / ratings.length;
+                        }
+
+                        return Container(
+                          padding: const EdgeInsets.symmetric(vertical: 25),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [AppColors.primary, AppColors.secondary],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withOpacity(0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              // AREA 1: KLIK KE WISATA LIST
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const WisataListPage(
+                                          kategori: 'all',
+                                          kategoriName: 'Semua Wisata',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Column(
+                                    children: [
+                                      const Icon(Icons.landscape_rounded, color: AppColors.highlight, size: 30),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        wisataList.length.toString(),
+                                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                      ),
+                                      const Text("Wisata", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              // AREA 2: KLIK KE KOMENTAR PAGE
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => KomentarPage(wisataList: wisataList),
+                                      ),
+                                    );
+                                  },
+                                  child: Column(
+                                    children: [
+                                      const Icon(Icons.rate_review_rounded, color: AppColors.highlight, size: 30),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        totalUlasan.toString(),
+                                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                      ),
+                                      const Text("Ulasan", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              // AREA 3: KLIK KE RATING LIST PAGE
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => RatingListPage(
+                                          wisataList: wisataList,
+                                          ratingPerWisata: const <String, List<int>>{},
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Column(
+                                    children: [
+                                      const Icon(Icons.star_rounded, color: AppColors.highlight, size: 30),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        avgRating.toStringAsFixed(1),
+                                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                      ),
+                                      const Text("Rating", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 30),
+                Text(
+                  "Menu Utama",
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                // MENU CEPAT (WIDGET DASAR)
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const WisataListPage(
+                                kategori: 'all',
+                                kategoriName: 'Semua Wisata',
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 25),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              const Icon(
+                                Icons.edit_location_alt_rounded,
+                                color: AppColors.primary,
+                                size: 35,
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                "Kelola Wisata",
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  KomentarPage(wisataList: wisataList),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 25),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              const Icon(
+                                Icons.chat_bubble_rounded,
+                                color: AppColors.accent,
+                                size: 35,
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                "Ulasan User",
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           );
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        selectedItemColor: primaryColor,
-        onTap: (index) {
-          setState(() => _selectedIndex = index);
-          if (index == 0) {
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (_) => const AdminDashboardPage()));
-          } else if (index == 1 || index == 2) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const WisataFormPage()));
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
-          BottomNavigationBarItem(icon: Icon(Icons.place), label: 'Wisata'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
-        ],
-      ),
-    );
-  }
 
-  Widget _statCard(String title, String value, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: primaryColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.white, size: 28),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(value,
-                  style: const TextStyle(
-                      fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
-              Text(title, style: const TextStyle(color: Colors.white70)),
-            ],
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: Colors.grey,
+        currentIndex: 0,
+        backgroundColor: Colors.white,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.grid_view_rounded),
+            label: "Dashboard",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map_rounded),
+            label: "Wisata",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_pin_rounded),
+            label: "Profil",
           ),
         ],
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const WisataListPage(
+                  kategori: 'all',
+                  kategoriName: 'Semua Wisata',
+                ),
+              ),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const InformasiProfilAdmin()),
+            );
+          }
+        },
       ),
     );
   }

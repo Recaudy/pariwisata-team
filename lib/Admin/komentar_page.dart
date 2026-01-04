@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/komentar_service.dart';
 import '../models/wisata_model.dart';
 import 'package:intl/intl.dart';
+
+// Tema Warna Tetap Konsisten
+class AppColors {
+  static const Color primary   = Color(0xFF21899C); // Teal Tua
+  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
+  static const Color accent    = Color(0xFFF56B3F); // Oranye
+  static const Color highlight = Color(0xFFF9CA58); // Kuning
+}
 
 class KomentarPage extends StatelessWidget {
   final List<WisataModel> wisataList;
@@ -14,148 +23,214 @@ class KomentarPage extends StatelessWidget {
     final KomentarService service = KomentarService();
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF2F5F7),
       appBar: AppBar(
-        title: const Text('Ulasan Pengguna'),
-        backgroundColor: const Color(0xFF21899C),
+        elevation: 0,
+        backgroundColor: AppColors.primary,
+        centerTitle: true,
+        title: Text(
+          'ULASAN PENGUNJUNG',
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: service.getKomentar(),
+        // Mengambil data real-time dari koleksi 'komentar'
+        stream: service.getKomentar(), 
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
           }
 
           final komentarList = snapshot.data?.docs ?? [];
 
           if (komentarList.isEmpty) {
-            return const Center(
-              child: Text('Belum ada ulasan',
-                  style: TextStyle(fontSize: 16, color: Colors.grey)),
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.chat_bubble_outline, size: 80, color: Colors.grey[400]),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Belum ada ulasan di database',
+                    style: GoogleFonts.inter(fontSize: 16, color: Colors.grey),
+                  ),
+                ],
+              ),
             );
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             itemCount: komentarList.length,
+            physics: const BouncingScrollPhysics(),
             itemBuilder: (context, index) {
               final doc = komentarList[index];
               final data = doc.data() as Map<String, dynamic>;
+              
+              // Mengambil data dari Firestore sesuai screenshot Anda
               final user = data['user'] ?? 'Anonim';
               final komentar = data['komentar'] ?? '';
-              final wisataId = data['wisataId'] ?? '';
+              final wisataId = data['wisataId'] ?? ''; // ID penghubung ke koleksi wisata
               final Timestamp? createdAtTimestamp = data['createdAt'];
               final createdAt = createdAtTimestamp != null
-                  ? DateFormat('dd MMM yyyy, HH:mm')
-                      .format(createdAtTimestamp.toDate())
+                  ? DateFormat('dd MMM yyyy, HH:mm').format(createdAtTimestamp.toDate())
                   : '';
 
-              // Cari data wisata sesuai wisataId
+              // LOGIKA PENGHUBUNG: Cari objek WisataModel berdasarkan wisataId dari database
               final wisata = wisataList.firstWhere(
                 (w) => w.id == wisataId,
                 orElse: () => WisataModel(
-                  id: '',
-                  nama: 'Wisata tidak ditemukan',
-                  lokasi: '',
-                  deskripsi: '',
-                  desc: '',
-                  gambar: '',
-                  image: '',
-                  kategori: '',
-                  subJudul: '',
-                  sejarah: '',
+                  id: '', nama: 'Tempat Wisata Tidak Ditemukan', lokasi: '', deskripsi: '',
+                  desc: '', gambar: '', image: '', kategori: '', subJudul: '', sejarah: '',
                 ),
               );
 
-              return Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                elevation: 2,
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // FOTO WISATA
-                      if (wisata.gambar.isNotEmpty)
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            wisata.gambar,
-                            height: 150,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
+              return Container(
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Tampilan Nama Tempat Wisata (Header ulasan)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF8F9FA),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15),
                         ),
-                      const SizedBox(height: 8),
-                      // Nama & deskripsi wisata
-                      Text(
-                        wisata.nama,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
                       ),
-                      Text(
-                        wisata.deskripsi,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.grey),
-                      ),
-                      const Divider(height: 16),
-                      // Nama user & komentar
-                      Row(
+                      child: Row(
                         children: [
-                          const Icon(Icons.person, color: Colors.blue),
+                          const Icon(Icons.place_rounded, color: AppColors.accent, size: 18),
                           const SizedBox(width: 8),
-                          Text(user,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold)),
-                          const Spacer(),
-                          if (createdAt.isNotEmpty)
-                            Text(
-                              createdAt,
-                              style: const TextStyle(
-                                  fontSize: 12, color: Colors.grey),
+                          Expanded(
+                            child: Text(
+                              wisata.nama.toUpperCase(),
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                color: AppColors.primary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(komentar, style: const TextStyle(fontSize: 14)),
-                      const SizedBox(height: 8),
-                      // Tombol hapus admin
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () async {
-                              try {
-                                // Ambil id dokumen langsung
-                                final docId = doc.id;
-                                await service.deleteKomentar(docId);
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text("Komentar berhasil dihapus")),
-                                );
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(
-                                          "Gagal menghapus komentar: $e")),
-                                );
-                              }
-                            },
                           ),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const CircleAvatar(
+                                radius: 18,
+                                backgroundColor: AppColors.secondary,
+                                child: Icon(Icons.person, color: Colors.white, size: 20),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      user,
+                                      style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    Text(
+                                      createdAt,
+                                      style: GoogleFonts.inter(fontSize: 11, color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Tombol Hapus (Admin)
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+                                onPressed: () => _confirmDelete(context, service, doc.id),
+                              ),
+                            ],
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            child: Divider(height: 1, color: Color(0xFFEEEEEE)),
+                          ),
+                          // Isi Komentar dari Database
+                          Text(
+                            '"$komentar"',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              height: 1.5,
+                              fontStyle: FontStyle.italic,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               );
             },
           );
         },
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, KomentarService service, String docId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text("Hapus Ulasan?"),
+        content: const Text("Data ulasan ini akan dihapus permanen dari database."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await service.deleteKomentar(docId);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Ulasan berhasil dihapus"), backgroundColor: AppColors.primary),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Gagal menghapus: $e"), backgroundColor: Colors.red),
+                );
+              }
+            },
+            child: const Text("Hapus", style: TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
     );
   }
