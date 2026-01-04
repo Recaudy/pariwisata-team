@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/wisata_model.dart';
 import '../services/wisata_services.dart';
 import 'wisata_form_page.dart';
 
-const Color primaryColor = Color(0xFF21899C);
+// Tema Warna Konsisten
+class AppColors {
+  static const Color primary   = Color(0xFF21899C); // Teal Tua
+  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
+  static const Color accent    = Color(0xFFF56B3F); // Oranye
+  static const Color highlight = Color(0xFFF9CA58); // Kuning
+}
 
 class WisataListPage extends StatefulWidget {
   final String kategori;
@@ -22,10 +29,8 @@ class WisataListPage extends StatefulWidget {
 class _WisataListPageState extends State<WisataListPage> {
   final WisataService _service = WisataService();
 
-  /// kategori aktif
   late String selectedKategori;
 
-  /// map kategori
   final Map<String, String> kategoriMap = {
     'all': 'Semua Wisata',
     'pantai': 'Pantai',
@@ -33,8 +38,8 @@ class _WisataListPageState extends State<WisataListPage> {
     'religi': 'Wisata Religi',
   };
 
-  /// limit item (untuk dashboard)
-  final int maxItems = 5;
+  // Batasan item jika diakses dari ringkasan (opsional)
+  final int maxItems = 10; 
 
   @override
   void initState() {
@@ -45,101 +50,167 @@ class _WisataListPageState extends State<WisataListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF2F5F7),
       appBar: AppBar(
-        title: Text(kategoriMap[selectedKategori] ?? "Wisata"),
-        backgroundColor: primaryColor,
+        elevation: 0,
+        centerTitle: true,
+        backgroundColor: AppColors.primary,
+        title: Text(
+          kategoriMap[selectedKategori]?.toUpperCase() ?? "WISATA",
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
       ),
       body: StreamBuilder<List<WisataModel>>(
         stream: _service.getWisata(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
 
           final wisataList = snapshot.data ?? [];
 
-          /// filter kategori
+          // Logika Filter Kategori
           final filteredWisata = selectedKategori == 'all'
               ? wisataList
-              : wisataList
-                  .where((w) => w.kategori == selectedKategori)
-                  .toList();
-
-          /// batasi tampilan
-          final displayWisata = filteredWisata.length > maxItems
-              ? filteredWisata.sublist(0, maxItems)
-              : filteredWisata;
+              : wisataList.where((w) => w.kategori == selectedKategori).toList();
 
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// ================= DROPDOWN =================
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: DropdownButtonFormField<String>(
-                  value: selectedKategori,
-                  decoration: const InputDecoration(
-                    labelText: "Pilih Kategori",
-                    border: OutlineInputBorder(),
+              // 1. HEADER & DROPDOWN FILTER
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
                   ),
-                  items: kategoriMap.entries
-                      .map(
-                        (e) => DropdownMenuItem(
-                          value: e.key,
-                          child: Text(e.value),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Filter Kategori",
+                      style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white30),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButtonFormField<String>(
+                          value: selectedKategori,
+                          dropdownColor: AppColors.primary,
+                          style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600),
+                          decoration: const InputDecoration(border: InputBorder.none),
+                          items: kategoriMap.entries.map((e) {
+                            return DropdownMenuItem(
+                              value: e.key,
+                              child: Text(e.value, style: const TextStyle(color: Colors.white)),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedKategori = value!;
+                            });
+                          },
                         ),
-                      )
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedKategori = value!;
-                    });
-                  },
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
-              /// ================= LIST =================
+              const SizedBox(height: 20),
+
+              // 2. LIST DATA (WIDGET DASAR LINIER)
               Expanded(
-                child: displayWisata.isEmpty
-                    ? const Center(child: Text("Belum ada wisata"))
+                child: filteredWisata.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.map_rounded, size: 80, color: Colors.grey[300]),
+                            const SizedBox(height: 10),
+                            const Text("Belum ada data wisata", style: TextStyle(color: Colors.grey)),
+                          ],
+                        ),
+                      )
                     : ListView.builder(
-                        itemCount: displayWisata.length,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: filteredWisata.length,
+                        physics: const BouncingScrollPhysics(),
                         itemBuilder: (context, index) {
-                          final w = displayWisata[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
+                          final w = filteredWisata[index];
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 15),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
                             child: ListTile(
+                              contentPadding: const EdgeInsets.all(10),
+                              leading: Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: AppColors.secondary.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(Icons.landscape_rounded, color: AppColors.primary),
+                              ),
                               title: Text(
                                 w.nama,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: AppColors.primary,
+                                ),
                               ),
-                              subtitle: Text(w.lokasi),
+                              subtitle: Row(
+                                children: [
+                                  const Icon(Icons.location_on, size: 14, color: AppColors.accent),
+                                  const SizedBox(width: 4),
+                                  Expanded(
+                                    child: Text(
+                                      w.lokasi,
+                                      style: GoogleFonts.inter(fontSize: 12),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  /// EDIT
+                                  // EDIT BUTTON
                                   IconButton(
-                                    icon: const Icon(Icons.edit,
-                                        color: Colors.blue),
+                                    icon: const Icon(Icons.edit_document, color: Colors.blue),
                                     onPressed: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) =>
-                                              WisataFormPage(wisata: w),
+                                          builder: (_) => WisataFormPage(wisata: w),
                                         ),
                                       );
                                     },
                                   ),
-
-                                  /// DELETE
+                                  // DELETE BUTTON
                                   IconButton(
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.red),
-                                    onPressed: () async {
-                                      await _service.deleteWisata(w.id);
-                                    },
+                                    icon: const Icon(Icons.delete_forever_rounded, color: Colors.redAccent),
+                                    onPressed: () => _confirmDelete(context, w),
                                   ),
                                 ],
                               ),
@@ -148,30 +219,46 @@ class _WisataListPageState extends State<WisataListPage> {
                         },
                       ),
               ),
-
-              /// ================= LIHAT SELENGKAPNYA =================
-              if (filteredWisata.length > maxItems)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: TextButton(
-                    child: const Text("Lihat Selengkapnya"),
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => WisataListPage(
-                            kategori: selectedKategori,
-                            kategoriName:
-                                kategoriMap[selectedKategori] ?? "Wisata",
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
             ],
           );
         },
+      ),
+    );
+  }
+
+  // Fungsi Konfirmasi Hapus Dasar
+  void _confirmDelete(BuildContext context, WisataModel w) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text("Hapus Wisata?"),
+        content: Text("Apakah Anda yakin ingin menghapus '${w.nama}'?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () async {
+              Navigator.pop(context);
+              await _service.deleteWisata(w.id);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("${w.nama} berhasil dihapus"),
+                    backgroundColor: AppColors.primary,
+                  ),
+                );
+              }
+            },
+            child: const Text("Hapus", style: TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
     );
   }

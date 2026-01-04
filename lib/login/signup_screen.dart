@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
-
 import 'package:google_fonts/google_fonts.dart';
-
 import 'login_screen.dart'; 
 import '../services/auth_service.dart'; 
+
+// TEMA WARNA APLIKASI
+class AppColors {
+  static const Color primary   = Color(0xFF21899C); 
+  static const Color secondary = Color(0xFF4DA1B0); 
+  static const Color accent    = Color(0xFFF56B3F); 
+  static const Color highlight = Color(0xFFF9CA58); 
+}
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -13,16 +19,13 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  // --- LOGIKA & FUNGSI (TIDAK BERUBAH SAMA SEKALI) ---
   final AuthService _authService = AuthService();
-
-  // Controllers dari SignupScreen
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  // Role HANYA diatur di sini, tidak ada interaksi UI.
-  String _selectedRole = 'User'; // Default role disetel otomatis ke 'User'
-
+  String _selectedRole = 'User'; 
   bool _isLoading = false;
   bool isPasswordHidden = true;
 
@@ -34,375 +37,223 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  // Fungsi Signup
   void _signup() async {
-    // Menghilangkan fokus keyboard
     FocusScope.of(context).unfocus();
-
-    setState(() {
-      _isLoading = true; // Tampilkan spinner
-    });
+    setState(() { _isLoading = true; });
 
     String? result = await _authService.signup(
       name: _nameController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text.trim(),
-      role: _selectedRole, // Mengirim 'User' secara otomatis
+      role: _selectedRole,
     );
 
-    setState(() {
-      _isLoading = false; // Sembunyikan spinner
-    });
+    setState(() { _isLoading = false; });
 
     if (result == null) {
-      // Signup berhasil
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Signup Berhasil! Silakan Login.'),
-          backgroundColor: Color(0xFF00AD8F),
+          backgroundColor: Color(0xFF21899C),
         ),
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
     } else {
-      // Signup gagal
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Signup Gagal: $result'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Signup Gagal: $result'), backgroundColor: Colors.red),
       );
     }
   }
 
+  // --- TAMPILAN UI (WIDGET DASAR EKSPLISIT) ---
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF21899C),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: SizedBox(
-            height: size.height - MediaQuery.of(context).padding.top,
-            child: Stack(
-              children: <Widget>[
-                // Desain latar belakang kiri
-               
+      backgroundColor: AppColors.primary,
+      body: Stack(
+        children: [
 
-                // UI konten
-                Positioned(
-                  top: 8.0,
-                  child: SizedBox(
-                    width: size.width,
-                    height: size.height,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: size.width * 0.06,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Bagian logo
-                          Expanded(
-                            flex: 3,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                           
-                                const SizedBox(height: 16),
-                                richText(23.12),
-                              ],
-                            ),
-                          ),
+          // Layer Gradasi Hijau
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.primary.withOpacity(0.7),
+                  AppColors.primary,
+                ],
+              ),
+            ),
+          ),
 
-                          // Form pendaftaran (Nama, Email, Password)
-                          Expanded(
-                            flex: 6,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                nameTextField(size),
-                                const SizedBox(height: 8),
-                                emailTextField(size),
-                                const SizedBox(height: 8),
-                                passwordTextField(size),
-                                // Menambah jarak karena roleDropdown dihapus
-                                const SizedBox(height: 32),
-                              ],
-                            ),
-                          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Column(
+                children: [
+                  const SizedBox(height: 50),
+                  
+                  // Header: Icon dan Judul
+                  const Icon(Icons.person_add_alt_1_rounded, size: 80, color: AppColors.highlight),
+                  const SizedBox(height: 10),
+                  Text.rich(
+                    TextSpan(
+                      style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.bold),
+                      children: const [
+                        TextSpan(text: 'SIGNUP ', style: TextStyle(color: Colors.white)),
+                        
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  const Text(
+                    'Silahkan lengkapi data diri Anda',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                  ),
 
-                          // Tombol Sign up
-                          Expanded(
-                            flex: 2,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                signUpButton(size),
-                                const SizedBox(height: 16),
-                              ],
-                            ),
-                          ),
+                  const SizedBox(height: 40),
 
-                          // Footer: sudah punya akun? Login
-                          Expanded(
-                            flex: 4,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [buildFooter(size)],
-                            ),
-                          ),
-                        ],
+                  // INPUT NAMA LENGKAP
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("Nama Lengkap", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.secondary.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: TextField(
+                      controller: _nameController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.person_outline, color: Colors.white),
+                        hintText: "Masukan Nama Anda",
+                        hintStyle: TextStyle(color: Colors.white54),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(vertical: 15),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
+                  const SizedBox(height: 15),
 
+                  // INPUT EMAIL
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("Email", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.secondary.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: TextField(
+                      controller: _emailController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.email_outlined, color: Colors.white),
+                        hintText: "Masukan Email Anda",
+                        hintStyle: TextStyle(color: Colors.white54),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(vertical: 15),
+                      ),
+                    ),
+                  ),
 
-  Widget richText(double fontSize) {
-    return Text.rich(
-      TextSpan(
-        style: GoogleFonts.inter(
-          fontSize: 23.12,
-          color: Colors.white,
-          letterSpacing: 1.999999953855673,
-        ),
-        children: const [
-          TextSpan(
-            text: 'SIGNUP',
-            style: TextStyle(fontWeight: FontWeight.w800),
-          ),
-          TextSpan(
-            text: 'PAGE',
-            style: TextStyle(
-              color: Color(0xFFFE9879),
-              fontWeight: FontWeight.w800,
+                  const SizedBox(height: 15),
+
+                  // INPUT PASSWORD
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("Password", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.secondary.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: TextField(
+                      controller: _passwordController,
+                      obscureText: isPasswordHidden,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.lock_outline, color: Colors.white),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            isPasswordHidden ? Icons.visibility_off : Icons.visibility,
+                            color: Colors.white,
+                          ),
+                          onPressed: () => setState(() => isPasswordHidden = !isPasswordHidden),
+                        ),
+                        hintText: "Buat Password",
+                        hintStyle: const TextStyle(color: Colors.white54),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 15),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // TOMBOL SIGN UP
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _signup,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 5,
+                      ),
+                      child: _isLoading 
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            'SIGN UP', 
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                          ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // FOOTER (NAVIGASI KE LOGIN)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Sudah Punya Akun? ", style: TextStyle(color: Colors.white)),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+                        },
+                        child: const Text(
+                          "Login",
+                          style: TextStyle(
+                            color: AppColors.highlight, 
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  // Widget baru untuk nama
-  Widget nameTextField(Size size) {
-    return Container(
-      alignment: Alignment.center,
-      height: size.height / 12,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        color: const Color(0xFF4DA1B0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            const Icon(Icons.person, color: Colors.white70),
-            const SizedBox(width: 16),
-      
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextField(
-                controller: _nameController,
-                maxLines: 1,
-                cursorColor: Colors.white70,
-                keyboardType: TextInputType.name,
-                style: GoogleFonts.inter(
-                  fontSize: 14.0,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Enter your name',
-                  hintStyle: GoogleFonts.inter(
-                    fontSize: 14.0,
-                    color: Colors.white70,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Widget emailTextField diadaptasi
-  Widget emailTextField(Size size) {
-    return Container(
-      alignment: Alignment.center,
-      height: size.height / 12,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        color: const Color(0xFF4DA1B0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            const Icon(Icons.mail_rounded, color: Colors.white70),
-            const SizedBox(width: 16),
-         
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextField(
-                controller: _emailController,
-                maxLines: 1,
-                cursorColor: Colors.white70,
-                keyboardType: TextInputType.emailAddress,
-                style: GoogleFonts.inter(
-                  fontSize: 14.0,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Enter your gmail address',
-                  hintStyle: GoogleFonts.inter(
-                    fontSize: 14.0,
-                    color: Colors.white70,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Widget passwordTextField diadaptasi
-  Widget passwordTextField(Size size) {
-    return Container(
-      alignment: Alignment.center,
-      height: size.height / 12,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        color: const Color(0xFF4DA1B0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            const Icon(Icons.lock, color: Colors.white70),
-            const SizedBox(width: 16),
-   
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextField(
-                controller: _passwordController,
-                maxLines: 1,
-                cursorColor: Colors.white70,
-                keyboardType: TextInputType.visiblePassword,
-                obscureText: isPasswordHidden,
-                style: GoogleFonts.inter(
-                  fontSize: 14.0,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Enter your password',
-                  hintStyle: GoogleFonts.inter(
-                    fontSize: 14.0,
-                    color: Colors.white70,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        isPasswordHidden = !isPasswordHidden;
-                      });
-                    },
-                    icon: Icon(
-                      isPasswordHidden
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      color: Colors.white70,
-                    ),
-                  ),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-
-  // Widget signUpButton diadaptasi
-  Widget signUpButton(Size size) {
-    return InkWell(
-      onTap: _isLoading ? null : _signup,
-      child: Container(
-        alignment: Alignment.center,
-        height: size.height / 13,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.0),
-          color: _isLoading
-              ? const Color(0xFFF56B3F).withOpacity(0.5)
-              : const Color(0xFFF56B3F),
-        ),
-        child: _isLoading
-            ? const CircularProgressIndicator(color: Colors.white)
-            : Text(
-                'Sign Up',
-                style: GoogleFonts.inter(
-                  fontSize: 16.0,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-      ),
-    );
-  }
-
-  // Widget buildFooter diadaptasi untuk navigasi ke LoginScreen
-  Widget buildFooter(Size size) {
-    return Align(
-      alignment: Alignment.center,
-      child: InkWell(
-        onTap: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const LoginScreen()),
-          );
-        },
-        child: Text.rich(
-          TextSpan(
-            style: GoogleFonts.nunito(fontSize: 16.0, color: Colors.white),
-            children: [
-              TextSpan(
-                text: 'Already have an account? ',
-                style: GoogleFonts.nunito(fontWeight: FontWeight.w600),
-              ),
-              TextSpan(
-                text: 'Login', // Diubah menjadi Login
-                style: GoogleFonts.nunito(
-                  color: const Color(0xFFF9CA58),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
