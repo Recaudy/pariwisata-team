@@ -11,6 +11,7 @@ import '../models/user_model.dart';
 import '../login/login_screen.dart';
 // !!! PENTING: Ganti import ini ke lokasi file InformasiProfil Anda
 import '../widget/profile_page.dart';
+import '../widget/cuaca_page.dart';
 
 // WARNA UTAMA
 const Color primaryColor = Color(0xFF21899C);
@@ -185,6 +186,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ChatPage()),
+                );
+              },
+            ),
+            _drawerItem(
+              icon: Icons.wb_sunny_outlined,
+              title: 'Cuaca',
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => WeatherPage()),
                 );
               },
             ),

@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:51259478934:android:b97ef84290da404e00c3b7",
+        "android_client_info": {
+          "package_name": "com.company.wisata"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnmsN4qIlyRc6ylJlIZgdUrpvbMnSv2mk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:51259478934:android:e71a74efc4c50f3200c3b7",
         "android_client_info": {
           "package_name": "com.example.project_uts_pariwisata"

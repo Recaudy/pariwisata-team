@@ -10,74 +10,46 @@ class ApiService {
     'Bangka Barat': '19.05.01.1001',
     'Pangkal Pinang': '19.71.04.1005',
   };
- 
-  Future<List<CuacaModel>> _fetchCuacaForLocation(
+
+  Future<List<CuacaModel>> _fetchAllWeatherForLocation(
     String adm4Code,
     String locationName,
   ) async {
     final url = 'https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=$adm4Code';
 
     try {
-      final response = await http.get(Uri.parse(url));
+      final response = await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        if (data['data'] == null || data['data'].isEmpty) return [];
 
-        if (data['data'] == null ||
-            data['data'].isEmpty ||
-            data['data'][0]['cuaca'] == null) {
-          return [];
-        }
-
-        List<dynamic> allCuaca = (data['data'][0]['cuaca'] as List)
+        // Mengambil SEMUA data cuaca (jam-jam berbeda)
+        List<dynamic> allCuacaRaw = (data['data'][0]['cuaca'] as List)
             .expand((e) => e)
             .toList();
 
-        String today = DateTime.now().toIso8601String().substring(0, 10);
-        List<CuacaModel> result = allCuaca
-            .where(
-              (item) =>
-                  item['local_datetime'] != null &&
-                  item['local_datetime'].substring(0, 10) == today,
-            )
-            .map(
-              (item) => CuacaModel.fromjson(item, locationName),
-            ) 
+        // Konversi ke List<CuacaModel>
+        return allCuacaRaw
+            .map((item) => CuacaModel.fromjson(item, locationName))
             .toList();
-        return result;
-      } else {
-        print(
-          'Failed to load weather data for $locationName. Status Code: ${response.statusCode}',
-        );
-        return [];
       }
     } catch (e) {
-      print('An exception occurred while fetching data for $locationName: $e');
-      return [];
+      print('Error $locationName: $e');
     }
+    return [];
   }
 
-  Future<List<CuacaModel>> fetchCuacaHariIni() async {
+  Future<List<CuacaModel>> fetchAllCuaca() async {
     List<Future<List<CuacaModel>>> futures = [];
+    locations.forEach(
+      (name, code) => futures.add(_fetchAllWeatherForLocation(code, name)),
+    );
 
-    locations.forEach((name, code) {
-      futures.add(_fetchCuacaForLocation(code, name));
-    });
-
-    List<List<CuacaModel>> allResults = await Future.wait(futures);
-
-    List<CuacaModel> combinedList = allResults.expand((list) => list).toList();
-
-    combinedList.sort((a, b) {
-      try {
-        DateTime timeA = DateTime.parse(a.localDatetime);
-        DateTime timeB = DateTime.parse(b.localDatetime);
-        return timeA.compareTo(timeB);
-      } catch (e) {
-        return 0;
-      }
-    });
-
-    return combinedList;
+    List<List<CuacaModel>> results = await Future.wait(futures);
+    // Menggabungkan semua list menjadi satu list besar
+    return results.expand((list) => list).toList();
   }
 }

@@ -107,11 +107,11 @@ class AuthService {
       if (user == null) return "User tidak login";
 
       File file = File(filePath);
-      final String fileName = 'avatars/${user.uid}.jpg';
+      final String fileName = 'profil/${user.uid}.jpg';
 
       // 1. Upload ke Supabase Storage (Pastikan Bucket 'avatars' sudah ada dan PUBLIC)
       await _supabase.storage
-          .from('avatars')
+          .from('profil')
           .upload(
             fileName,
             file,
@@ -120,7 +120,7 @@ class AuthService {
 
       // 2. Ambil URL Publik
       final String publicUrl = _supabase.storage
-          .from('avatars')
+          .from('profil')
           .getPublicUrl(fileName);
 
       // 3. Update link di Firestore agar tersinkron ke semua widget

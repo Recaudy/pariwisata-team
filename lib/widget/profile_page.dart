@@ -1,15 +1,14 @@
-// screens/informasi_profil.dart
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-// Sesuaikan path import
+// Sesuaikan path import sesuai struktur folder Anda
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
-import '../login/login_screen.dart';
 
-// WARNA UTAMA
-const Color primaryColor = Color(0xFF21899C);
+// SKEMA WARNA BARU
+const Color mainColor = Color(0xFF21899C); // Tosca
+const Color subColor = Color(0xFFE6F4F6);  // Biru Muda (Background)
+const Color fieldFillColor = Color(0xFFF0F9FA); // Warna isi input yang lebih lembut
 
 class InformasiProfil extends StatefulWidget {
   final UserModel user;
@@ -34,7 +33,6 @@ class _InformasiProfilState extends State<InformasiProfil> {
   @override
   void initState() {
     super.initState();
-    // Inisialisasi controller hanya untuk Nama
     _nameController = TextEditingController(text: widget.user.name);
   }
 
@@ -44,6 +42,8 @@ class _InformasiProfilState extends State<InformasiProfil> {
     _passwordController.dispose();
     super.dispose();
   }
+
+  // --- LOGIKA FUNGSI ---
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -59,36 +59,28 @@ class _InformasiProfilState extends State<InformasiProfil> {
 
   Future<void> _updateProfilePicture() async {
     if (_newProfileImageFile == null) return;
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    final newPhotoUrlOrError = await _authService.uploadProfilePicture(
+    setState(() => _isLoading = true);
+    final res = await _authService.uploadProfilePicture(
       _newProfileImageFile!.path,
     );
 
     if (mounted) {
-      if (newPhotoUrlOrError != null &&
-          !newPhotoUrlOrError.startsWith("Firebase")) {
+      if (res != null && !res.startsWith("Firebase")) {
+        setState(() {
+          widget.user.photoUrl = res;
+          _newProfileImageFile = null;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Foto profil berhasil diperbarui!')),
         );
-        setState(() {
-          widget.user.photoUrl = newPhotoUrlOrError;
-          _newProfileImageFile = null;
-        });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mengunggah foto: $newPhotoUrlOrError')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Gagal mengunggah foto: $res')));
       }
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
-
 
   Future<void> _updateProfileData() async {
     if (!_formKey.currentState!.validate()) return;
@@ -103,43 +95,27 @@ class _InformasiProfilState extends State<InformasiProfil> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
-
-    String? errorMessage;
-    String? nameUpdateError;
-    String? passwordUpdateError;
+    setState(() => _isLoading = true);
 
     try {
-      // 1. Perbarui Nama
+      String? errorMessage;
       if (nameChanged) {
-        nameUpdateError = await _authService.updateUserName(
-          _nameController.text,
-        );
-        if (nameUpdateError != null)
-          errorMessage =
-              (errorMessage ?? '') + 'Nama gagal: $nameUpdateError. ';
+        final err = await _authService.updateUserName(_nameController.text);
+        if (err != null)
+          errorMessage = (errorMessage ?? '') + 'Nama gagal: $err. ';
       }
-
-      // 2. Perbarui Password
       if (passwordChanged) {
-        passwordUpdateError = await _authService.updatePassword(
-          _passwordController.text,
-        );
-        if (passwordUpdateError != null)
-          errorMessage =
-              (errorMessage ?? '') + 'Password gagal: $passwordUpdateError. ';
+        final err = await _authService.updatePassword(_passwordController.text);
+        if (err != null)
+          errorMessage = (errorMessage ?? '') + 'Password gagal: $err. ';
       }
 
       if (mounted) {
         if (errorMessage == null) {
-          // Update data lokal
           setState(() {
             widget.user.name = _nameController.text;
             _passwordController.clear();
           });
-
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Profil berhasil diperbarui!')),
           );
@@ -153,16 +129,14 @@ class _InformasiProfilState extends State<InformasiProfil> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Terjadi kesalahan umum: $e')));
+        ).showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
+
+  // --- UI / TAMPILAN ---
 
   @override
   Widget build(BuildContext context) {
@@ -177,86 +151,70 @@ class _InformasiProfilState extends State<InformasiProfil> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: subColor, // Latar belakang Biru Muda
       appBar: AppBar(
-        title: const Text(
-          "Edit Profile",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.keyboard_arrow_left, color: Colors.white),
+          icon: const Icon(
+            Icons.keyboard_arrow_left,
+            color: mainColor,
+            size: 30,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            onPressed: _isLoading ? null : _updateProfileData,
-            icon: _isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : const Icon(Icons.save, color: Colors.white),
-            tooltip: 'Simpan Perubahan',
-          ),
-        ],
+        title: const Text(
+          "Edit Profile",
+          style: TextStyle(color: mainColor, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
       ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 25),
           child: Column(
             children: [
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
 
-              // FOTO PROFIL & Tombol Ganti Foto
-              GestureDetector(
-                onTap: _pickImage,
+              // FOTO PROFIL
+              Center(
                 child: Stack(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white,
+                        border: Border.all(color: Colors.white, width: 4),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
+                            color: mainColor.withOpacity(0.2),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                          )
+                        ]
                       ),
-                      child: Hero(
-                        tag: 'foto-profil',
-                        child: CircleAvatar(
-                          radius: 55,
-                          backgroundImage: profileImage,
-                        ),
+                      child: CircleAvatar(
+                        radius: 70,
+                        backgroundColor: Colors.white,
+                        backgroundImage: profileImage,
                       ),
                     ),
-                    // Tombol overlay untuk ganti foto
                     Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: primaryColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 20,
+                      bottom: 5,
+                      right: 5,
+                      child: GestureDetector(
+                        onTap: _pickImage,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(
+                            color: mainColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt_outlined,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
                       ),
                     ),
@@ -264,39 +222,62 @@ class _InformasiProfilState extends State<InformasiProfil> {
                 ),
               ),
 
-              const SizedBox(height: 12),
-              Text(
-                widget.user.name,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 35),
+              const SizedBox(height: 40),
 
               // FIELD NAMA
-              _buildTextFormField(
+              _buildCustomField(
                 controller: _nameController,
-                icon: Icons.person,
-                label: "Nama",
-                validator: (val) =>
-                    val!.isEmpty ? 'Nama tidak boleh kosong' : null,
+                label: "Full Name",
+                icon: Icons.person_outline,
               ),
               const SizedBox(height: 20),
 
-              // FIELD EMAIL (Ditampilkan, tetapi tidak dapat diedit)
-              _buildStaticField(
-                icon: Icons.email,
-                label: "Email",
-                value: widget.user.email,
+              // FIELD EMAIL (Read Only)
+              _buildCustomField(
+                initialValue: widget.user.email,
+                label: "E-Mail",
+                icon: Icons.email_outlined,
+                readOnly: true,
               ),
-
               const SizedBox(height: 20),
 
               // FIELD PASSWORD
-              _buildPasswordFormField(),
+              _buildCustomField(
+                controller: _passwordController,
+                label: "Password Baru",
+                icon: Icons.lock_outline,
+                isPassword: true,
+              ),
 
               const SizedBox(height: 50),
+
+              // TOMBOL EDIT PROFILE
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _updateProfileData,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: mainColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15), // Lebih kotak tapi tetap melengkung
+                    ),
+                    elevation: 4,
+                    shadowColor: mainColor.withOpacity(0.4),
+                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          "Update Profil",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(height: 30),
             ],
           ),
         ),
@@ -304,148 +285,68 @@ class _InformasiProfilState extends State<InformasiProfil> {
     );
   }
 
-  // Widget kustom untuk field yang TIDAK DAPAT diedit (Email)
-  Widget _buildStaticField({
-    required IconData icon,
+  Widget _buildCustomField({
+    TextEditingController? controller,
+    String? initialValue,
     required String label,
-    required String value,
+    required IconData icon,
+    bool isPassword = false,
+    bool readOnly = false,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-      decoration: BoxDecoration(
-        color: Colors
-            .grey[100], // Warna abu-abu untuk menunjukkan tidak bisa diedit
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.grey, size: 22),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 16, color: Colors.black54),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 10, bottom: 8),
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: mainColor,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  // Widget kustom TextFormField
-  Widget _buildTextFormField({
-    required TextEditingController controller,
-    required IconData icon,
-    required String label,
-    String? Function(String?)? validator,
-    bool isEmail = false,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
-      validator: validator,
-      style: const TextStyle(fontSize: 16),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: primaryColor),
-        prefixIcon: Icon(icon, color: primaryColor),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: primaryColor, width: 2),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-        filled: true,
-        fillColor: Colors.grey[50],
-      ),
-    );
-  }
-
-  // Widget kustom PasswordField
-  Widget _buildPasswordFormField() {
-    return TextFormField(
-      controller: _passwordController,
-      obscureText: !_showPassword,
-      style: const TextStyle(fontSize: 16),
-      decoration: InputDecoration(
-        labelText: "Password Baru (Kosongkan jika tidak ingin ganti)",
-        labelStyle: const TextStyle(color: primaryColor),
-        prefixIcon: Icon(Icons.lock, color: primaryColor),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _showPassword ? Icons.visibility : Icons.visibility_off,
-            color: primaryColor,
+        TextFormField(
+          controller: controller,
+          initialValue: initialValue,
+          readOnly: readOnly,
+          obscureText: isPassword && !_showPassword,
+          style: TextStyle(
+            color: readOnly ? Colors.grey[600] : Colors.black87, 
+            fontSize: 16
           ),
-          onPressed: () => setState(() => _showPassword = !_showPassword),
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, color: mainColor),
+            suffixIcon: isPassword
+                ? IconButton(
+                    icon: Icon(
+                      _showPassword ? Icons.visibility : Icons.visibility_off,
+                      color: mainColor.withOpacity(0.6),
+                    ),
+                    onPressed: () =>
+                        setState(() => _showPassword = !_showPassword),
+                  )
+                : null,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 18,
+            ),
+            // Border normal
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(color: mainColor.withOpacity(0.1)),
+            ),
+            // Border saat diklik
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(color: mainColor, width: 1.5),
+            ),
+            filled: true,
+            fillColor: readOnly ? Colors.grey[200] : Colors.white,
+          ),
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: primaryColor, width: 2),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-        filled: true,
-        fillColor: Colors.grey[50],
-      ),
-      validator: (val) {
-        if (val!.isNotEmpty && val.length < 6) {
-          return 'Password minimal 6 karakter';
-        }
-        return null;
-      },
+      ],
     );
   }
 }
-
-
-class _ZoomFotoProfil extends StatelessWidget {
-  const _ZoomFotoProfil();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.white),
-        elevation: 0,
-      ),
-      body: Center(
-        child: Hero(
-          tag: 'foto-profil',
-          child: InteractiveViewer(
-            minScale: 1,
-            maxScale: 4,
-            child: Image.asset("assets/images/profil.jpg"),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ------------------------------------------------------------------
-// DUMMY CLASS LoginScreen
-// ------------------------------------------------------------------
-

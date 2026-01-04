@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:project_uts_pariwisata/widget/chat_bot_ai.dart';
+import 'package:project_uts_pariwisata/widget/maps_page.dart';
 import '../components/custom_drawer.dart';
 import 'detail_page.dart';
 import 'wisata_tab_view_page.dart';
+import 'cuaca_page.dart';
 
 const Color primaryColor = Color(0xFF21899C);
 
@@ -14,9 +17,12 @@ class HomePageWidget extends StatefulWidget {
 }
 
 class _HomePageWidgetState extends State<HomePageWidget> {
-  // Data untuk Filter Tab
   String selectedExploreTab = 'All';
-  final List<String> exploreTabs = ['All', 'Popular', 'Recomended'];
+  final List<String> exploreTabs = ['All'];
+
+  // Kontrol Pencarian
+  String searchQuery = "";
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -41,29 +47,39 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                   child: const Icon(Icons.menu, color: Colors.black),
                 ),
               ),
-
-              const SizedBox(width: 40), // Spacer agar teks tengah
+              const SizedBox(width: 40),
             ],
           ),
         ),
       ),
       drawer: const CustomDrawer(),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-              _buildSearchBar(),
+        child: Stack(
+          children: [
+            // Konten Utama
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  _buildSearchBar(),
 
-              // Bagian Explore Cities dengan Filter dan Firebase
-              _buildExploreCitiesSection(),
+                  _buildExploreCitiesSection(),
 
-              const SizedBox(height: 20),
-              _buildCategoriesSection(),
-              const SizedBox(height: 40),
-            ],
-          ),
+                  const SizedBox(height: 20),
+                  _buildCategoriesSection(),
+
+                  const SizedBox(height: 25),
+                  _buildQuickMenuSection(),
+
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+
+            // Overlay Dropdown Hasil Pencarian
+            if (searchQuery.isNotEmpty) _buildSearchDropdown(),
+          ],
         ),
       ),
     );
@@ -78,12 +94,117 @@ class _HomePageWidgetState extends State<HomePageWidget> {
           color: Colors.grey[100],
           borderRadius: BorderRadius.circular(16),
         ),
-        child: const TextField(
+        child: TextField(
+          controller: _searchController,
+          onChanged: (value) {
+            setState(() {
+              searchQuery = value.toLowerCase();
+            });
+          },
           decoration: InputDecoration(
-            hintText: "Discover city",
+            hintText: "Cari destinasi wisata...",
             border: InputBorder.none,
-            prefixIcon: Icon(Icons.search, color: Colors.black54),
-            suffixIcon: Icon(Icons.sort_sharp, color: Colors.black54),
+            prefixIcon: const Icon(Icons.search, color: Colors.black54),
+            suffixIcon: searchQuery.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.close, size: 20),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() => searchQuery = "");
+                    },
+                  )
+                : const Icon(Icons.sort_sharp, color: Colors.black54),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchDropdown() {
+    return Positioned(
+      top: 75, // Posisi tepat di bawah search bar
+      left: 20,
+      right: 20,
+      child: Material(
+        elevation: 10,
+        borderRadius: BorderRadius.circular(15),
+        color: Colors.white,
+        child: Container(
+          constraints: const BoxConstraints(maxHeight: 350),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('wisata').snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return const SizedBox();
+
+              final results = snapshot.data!.docs.where((doc) {
+                final data = doc.data() as Map<String, dynamic>;
+                final nama = (data['nama'] ?? '').toString().toLowerCase();
+                return nama.contains(searchQuery);
+              }).toList();
+
+              if (results.isEmpty) {
+                return const ListTile(
+                  title: Text(
+                    "Pencarian tidak ditemukan",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                );
+              }
+
+              return ListView.separated(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: results.length,
+                separatorBuilder: (context, index) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final data = results[index].data() as Map<String, dynamic>;
+                  return ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 5,
+                    ),
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        data['image'] ?? '',
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                        errorBuilder: (c, e, s) => Container(
+                          color: Colors.grey[200],
+                          width: 50,
+                          height: 50,
+                          child: const Icon(Icons.image),
+                        ),
+                      ),
+                    ),
+                    title: Text(
+                      data['nama'] ?? '',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      data['sub_judul'] ?? '',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    onTap: () {
+                      setState(() => searchQuery = "");
+                      _searchController.clear();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailPage(wisataData: data),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
           ),
         ),
       ),
@@ -95,8 +216,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(padding: EdgeInsets.only(left: 20, top: 20, bottom: 10)),
-
-        // --- TOMBOL FILTER (All, Popular, Recomended) ---
         SizedBox(
           height: 40,
           child: ListView.builder(
@@ -109,11 +228,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedExploreTab = tab;
-                    });
-                  },
+                  onTap: () => setState(() => selectedExploreTab = tab),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
@@ -133,7 +248,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         fontWeight: isSelected
                             ? FontWeight.bold
                             : FontWeight.normal,
-                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -142,41 +256,31 @@ class _HomePageWidgetState extends State<HomePageWidget> {
             },
           ),
         ),
-
         const SizedBox(height: 15),
-
-        // --- DAFTAR WISATA DARI FIREBASE ---
         SizedBox(
           height: 260,
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance.collection('wisata').snapshots(),
             builder: (context, snapshot) {
-              if (snapshot.hasError) return const Center(child: Text("Error"));
-              if (snapshot.connectionState == ConnectionState.waiting) {
+              if (snapshot.connectionState == ConnectionState.waiting)
                 return const Center(child: CircularProgressIndicator());
-              }
-
               final docs = snapshot.data!.docs;
-
               return ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 itemCount: docs.length,
                 itemBuilder: (context, index) {
                   final data = docs[index].data() as Map<String, dynamic>;
-
                   return PopularCardExplore(
-                    title: data['nama'] ?? 'Tanpa Nama',
-                    subtitle: data['sub_judul'] ?? 'Lokasi tidak diketahui',
+                    title: data['nama'] ?? '',
+                    subtitle: data['sub_judul'] ?? '',
                     image: data['image'] ?? '',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetailPage(wisataData: data),
-                        ),
-                      );
-                    },
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailPage(wisataData: data),
+                      ),
+                    ),
                   );
                 },
               );
@@ -194,7 +298,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Text(
-            "Categories",
+            "Kategori",
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ),
@@ -243,14 +347,94 @@ class _HomePageWidgetState extends State<HomePageWidget> {
       ],
     );
   }
+
+  Widget _buildQuickMenuSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildQuickMenuItem(
+            icon: Icons.auto_awesome,
+            label: "Tanya AI",
+            color: Colors.deepPurple,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ChatPage()),
+            ),
+          ),
+          _buildQuickMenuItem(
+            icon: Icons.map_outlined,
+            label: "Lokasi",
+            color: Colors.orange,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const MapsPage()),
+            ),
+          ),
+          _buildQuickMenuItem(
+            icon: Icons.wb_sunny_outlined,
+            label: "Cuaca",
+            color: Colors.blue,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const WeatherPage()),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickMenuItem({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.27,
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: color.withOpacity(0.2)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 28),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: color.darken(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Widget Penunjang
+extension ColorExtension on Color {
+  Color darken([double amount = .1]) {
+    final hsl = HSLColor.fromColor(this);
+    return hsl
+        .withLightness((hsl.lightness - amount).clamp(0.0, 1.0))
+        .toColor();
+  }
 }
 
 class PopularCardExplore extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String image;
+  final String title, subtitle, image;
   final VoidCallback onTap;
-
   const PopularCardExplore({
     super.key,
     required this.title,
@@ -286,13 +470,12 @@ class PopularCardExplore extends StatelessWidget {
                           height: 180,
                           width: 190,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                                color: Colors.grey[200],
-                                height: 180,
-                                width: 190,
-                                child: const Icon(Icons.broken_image),
-                              ),
+                          errorBuilder: (c, e, s) => Container(
+                            color: Colors.grey[200],
+                            height: 180,
+                            width: 190,
+                            child: const Icon(Icons.broken_image),
+                          ),
                         ),
                   Positioned(
                     top: 10,
@@ -360,10 +543,8 @@ class PopularCardExplore extends StatelessWidget {
 }
 
 class CategoryIcon extends StatelessWidget {
-  final String title;
-  final String iconAsset;
+  final String title, iconAsset;
   final VoidCallback onTap;
-
   const CategoryIcon({
     super.key,
     required this.title,
