@@ -1,16 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-// Sesuaikan path import sesuai struktur folder Anda
+import 'package:google_fonts/google_fonts.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
-
-// SKEMA WARNA BARU
-const Color mainColor = Color(0xFF21899C); // Tosca
-const Color subColor = Color(0xFFE6F4F6); // Biru Muda (Background)
-const Color fieldFillColor = Color(
-  0xFFF0F9FA,
-); // Warna isi input yang lebih lembut
 
 class InformasiProfil extends StatefulWidget {
   final UserModel user;
@@ -32,6 +25,10 @@ class _InformasiProfilState extends State<InformasiProfil> {
   bool _showPassword = false;
   File? _newProfileImageFile;
 
+  // Warna Utama Konsisten
+  final Color primaryColor = const Color(0xFF21899C);
+   final Color accent = const Color(0xFFF56B3F); 
+
   @override
   void initState() {
     super.initState();
@@ -46,7 +43,6 @@ class _InformasiProfilState extends State<InformasiProfil> {
   }
 
   // --- LOGIKA FUNGSI ---
-
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -62,9 +58,7 @@ class _InformasiProfilState extends State<InformasiProfil> {
   Future<void> _updateProfilePicture() async {
     if (_newProfileImageFile == null) return;
     setState(() => _isLoading = true);
-    final res = await _authService.uploadProfilePicture(
-      _newProfileImageFile!.path,
-    );
+    final res = await _authService.uploadProfilePicture(_newProfileImageFile!.path);
 
     if (mounted) {
       if (res != null && !res.startsWith("Firebase")) {
@@ -73,12 +67,12 @@ class _InformasiProfilState extends State<InformasiProfil> {
           _newProfileImageFile = null;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Foto profil berhasil diperbarui!')),
+          const SnackBar(content: Text('Foto profil diperbarui!')),
         );
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Gagal mengunggah foto: $res')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal mengunggah foto: $res')),
+        );
       }
       setState(() => _isLoading = false);
     }
@@ -86,271 +80,243 @@ class _InformasiProfilState extends State<InformasiProfil> {
 
   Future<void> _updateProfileData() async {
     if (!_formKey.currentState!.validate()) return;
-
-    final bool nameChanged = _nameController.text != widget.user.name;
-    final bool passwordChanged = _passwordController.text.isNotEmpty;
-
-    if (!nameChanged && !passwordChanged) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tidak ada perubahan untuk disimpan.')),
-      );
-      return;
-    }
-
     setState(() => _isLoading = true);
 
     try {
-      String? errorMessage;
-      if (nameChanged) {
-        final err = await _authService.updateUserName(_nameController.text);
-        if (err != null)
-          errorMessage = (errorMessage ?? '') + 'Nama gagal: $err. ';
+      if (_nameController.text != widget.user.name) {
+        await _authService.updateUserName(_nameController.text);
+        widget.user.name = _nameController.text;
       }
-      if (passwordChanged) {
-        final err = await _authService.updatePassword(_passwordController.text);
-        if (err != null)
-          errorMessage = (errorMessage ?? '') + 'Password gagal: $err. ';
+      if (_passwordController.text.isNotEmpty) {
+        await _authService.updatePassword(_passwordController.text);
       }
 
       if (mounted) {
-        if (errorMessage == null) {
-          setState(() {
-            widget.user.name = _nameController.text;
-            _passwordController.clear();
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profil berhasil diperbarui!')),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gagal memperbarui: $errorMessage')),
-          );
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profil berhasil diperbarui!')),
+        );
+        _passwordController.clear();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  // --- UI / TAMPILAN ---
-
   @override
   Widget build(BuildContext context) {
-    ImageProvider profileImage;
+    // Logika Gambar Profil
+    ImageProvider profileImg;
     if (_newProfileImageFile != null) {
-      profileImage = FileImage(_newProfileImageFile!);
-    } else if (widget.user.photoUrl != null &&
-        widget.user.photoUrl!.isNotEmpty) {
-      profileImage = NetworkImage(widget.user.photoUrl!);
+      profileImg = FileImage(_newProfileImageFile!);
+    } else if (widget.user.photoUrl != null && widget.user.photoUrl!.isNotEmpty) {
+      profileImg = NetworkImage(widget.user.photoUrl!);
     } else {
-      profileImage = const AssetImage("assets/images/profil.jpg");
+      profileImg = const AssetImage("assets/images/profil.jpg");
     }
 
     return Scaffold(
-      backgroundColor: subColor, // Latar belakang Biru Muda
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.keyboard_arrow_left,
-            color: mainColor,
-            size: 30,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          "Edit Profile",
-          style: TextStyle(color: mainColor, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-      ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 25),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-
-              // FOTO PROFIL
-              Center(
-                child: Stack(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 4),
-                        boxShadow: [
-                          BoxShadow(
-                            color: mainColor.withOpacity(0.2),
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                          ),
-                        ],
+      backgroundColor: const Color(0xFFF2F5F7),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // --- HEADER MELENGKUNG (SAMA DENGAN DASHBOARD) ---
+            Stack(
+              children: [
+                Container(
+                  height: 220,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(50),
+                      bottomRight: Radius.circular(50),
+                    ),
+                  ),
+                ),
+                SafeArea(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
+                          children: [
+                            const Spacer(),
+                            Text(
+                              "Edit Profil",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const Spacer(),
+                            const SizedBox(width: 48), // Penyeimbang Leading
+                          ],
+                        ),
                       ),
-                      child: CircleAvatar(
-                        radius: 70,
-                        backgroundColor: Colors.white,
-                        backgroundImage: profileImage,
+                      const SizedBox(height: 20),
+                      // FOTO PROFIL MANUAL
+                      Center(
+                        child: Stack(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: CircleAvatar(
+                                radius: 60,
+                                backgroundColor: Colors.grey[200],
+                                backgroundImage: profileImg,
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                onTap: _isLoading ? null : _pickImage,
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF9CA58), // Warna Highlight Kuning
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white, width: 2),
+                                  ),
+                                  child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            // --- FORM INPUT MANUAL ---
+            Padding(
+              padding: const EdgeInsets.all(25),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // INPUT NAMA
+                    Text("Nama Lengkap", style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: primaryColor)),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                      ),
+                      child: TextFormField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          icon: Icon(Icons.person_outline, color: Color(0xFF4DA1B0)),
+                        ),
                       ),
                     ),
-                    Positioned(
-                      bottom: 5,
-                      right: 5,
-                      child: GestureDetector(
-                        onTap: _pickImage,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(
-                            color: mainColor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.camera_alt_outlined,
-                            color: Colors.white,
-                            size: 20,
+
+                    const SizedBox(height: 20),
+
+                    // INPUT EMAIL (READ ONLY)
+                    Text("Email", style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: primaryColor)),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: TextFormField(
+                        initialValue: widget.user.email,
+                        readOnly: true,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          icon: Icon(Icons.email_outlined, color: Colors.grey),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // INPUT PASSWORD
+                    Text("Password Baru", style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: primaryColor)),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                      ),
+                      child: TextFormField(
+                        controller: _passwordController,
+                        obscureText: !_showPassword,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          icon: const Icon(Icons.lock_outline, color: Color(0xFF4DA1B0)),
+                          suffixIcon: IconButton(
+                            icon: Icon(_showPassword ? Icons.visibility : Icons.visibility_off, size: 20),
+                            onPressed: () => setState(() => _showPassword = !_showPassword),
                           ),
                         ),
                       ),
                     ),
+
+                    const SizedBox(height: 40),
+
+                    // TOMBOL UPDATE MANUAL
+                    GestureDetector(
+                      onTap: _isLoading ? null : _updateProfileData,
+                      child: Container(
+                        width: double.infinity,
+                        height: 55,
+                        decoration: BoxDecoration(
+                          color: accent,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: primaryColor.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: _isLoading
+                              ? const CircularProgressIndicator(color: Colors.white)
+                              : Text(
+                                  "UPDATE PROFIL",
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
-
-              const SizedBox(height: 40),
-
-              // FIELD NAMA
-              _buildCustomField(
-                controller: _nameController,
-                label: "Full Name",
-                icon: Icons.person_outline,
-              ),
-              const SizedBox(height: 20),
-
-              // FIELD EMAIL (Read Only)
-              _buildCustomField(
-                initialValue: widget.user.email,
-                label: "E-Mail",
-                icon: Icons.email_outlined,
-                readOnly: true,
-              ),
-              const SizedBox(height: 20),
-
-              // FIELD PASSWORD
-              _buildCustomField(
-                controller: _passwordController,
-                label: "Password Baru",
-                icon: Icons.lock_outline,
-                isPassword: true,
-              ),
-
-              const SizedBox(height: 50),
-
-              // TOMBOL EDIT PROFILE
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _updateProfileData,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: mainColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        15,
-                      ), // Lebih kotak tapi tetap melengkung
-                    ),
-                    elevation: 4,
-                    shadowColor: mainColor.withOpacity(0.4),
-                  ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                          "Update Profil",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                ),
-              ),
-              const SizedBox(height: 30),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
-
-  Widget _buildCustomField({
-    TextEditingController? controller,
-    String? initialValue,
-    required String label,
-    required IconData icon,
-    bool isPassword = false,
-    bool readOnly = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 10, bottom: 8),
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: mainColor,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        TextFormField(
-          controller: controller,
-          initialValue: initialValue,
-          readOnly: readOnly,
-          obscureText: isPassword && !_showPassword,
-          style: TextStyle(
-            color: readOnly ? Colors.grey[600] : Colors.black87,
-            fontSize: 16,
-          ),
-          decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: mainColor),
-            suffixIcon: isPassword
-                ? IconButton(
-                    icon: Icon(
-                      _showPassword ? Icons.visibility : Icons.visibility_off,
-                      color: mainColor.withOpacity(0.6),
-                    ),
-                    onPressed: () =>
-                        setState(() => _showPassword = !_showPassword),
-                  )
-                : null,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 18,
-            ),
-            // Border normal
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: BorderSide(color: mainColor.withOpacity(0.1)),
-            ),
-            // Border saat diklik
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: mainColor, width: 1.5),
-            ),
-            filled: true,
-            fillColor: readOnly ? Colors.grey[200] : Colors.white,
-          ),
-        ),
-      ],
     );
   }
 }

@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-// 1. Definisi Warna Utama
-const Color primaryColor = Color(0xFF21899C);
+// 4 WARNA UTAMA APLIKASI
+class AppColors {
+  static const Color primary = Color(0xFF21899C); // Teal Tua
+  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
+  static const Color accent = Color(0xFFF56B3F); // Oranye
+  static const Color highlight = Color(0xFFF9CA58); // Kuning Cerah
+}
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -18,13 +24,8 @@ class _ChatPageState extends State<ChatPage> {
   final List<Map<String, String>> _message = [];
   bool _isloading = false;
 
-  // --- BAGIAN YANG DIPERBARUI (API KEY) ---
   final String apiKey = "sk-qz1-zMuj5405dY1rB2ao-w";
-  
-  // Pastikan nama model ini didukung oleh server LiteLLM Anda. 
-  // Jika server menggunakan default, Anda mungkin tidak perlu mengubah ini, 
-  // atau bisa diganti sesuai model yang tersedia di server tersebut.
-  final String modelName = "openai/gpt-3.5-turbo"; 
+  final String modelName = "openai/gpt-3.5-turbo";
 
   void _clearChat() {
     setState(() {
@@ -43,7 +44,6 @@ class _ChatPageState extends State<ChatPage> {
 
     try {
       final response = await http.post(
-        // --- BAGIAN YANG DIPERBARUI (URL) ---
         Uri.parse("https://litellm.koboi2026.biz.id/v1/chat/completions"),
         headers: {
           "Authorization": "Bearer $apiKey",
@@ -55,7 +55,7 @@ class _ChatPageState extends State<ChatPage> {
             {
               "role": "system",
               "content":
-                  "Kamu adalah chatbot wisata Bangka Belitung. Jawabanmu hanya boleh tentang wisata Bangka Belitung. Jika pertanyaan di luar topik, jawab dengan sopan bahwa kamu hanya bisa memberikan informasi wisata Bangka Belitung.",
+                  "Kamu adalah chatbot wisata Bangka Belitung. Jawabanmu hanya boleh tentang wisata Bangka Belitung seperti Pantai, bukit dan wisata religi. Jika pertanyaan di luar topik, jawab dengan sopan bahwa kamu hanya bisa memberikan informasi wisata Bangka Belitung.",
             },
             ..._message,
           ],
@@ -63,252 +63,237 @@ class _ChatPageState extends State<ChatPage> {
       );
 
       final data = jsonDecode(response.body);
-
-      if (response.statusCode != 200) {
-        final apiErrorMessage =
-            data['error']?['message'] ?? 'Unknown API Error';
-        throw Exception('API Error (${response.statusCode}): $apiErrorMessage');
+      if (response.statusCode == 200) {
+        final reply = data["choices"][0]["message"]["content"];
+        setState(() => _message.add({"role": "assistant", "content": reply}));
       }
-
-      if (data["choices"] == null ||
-          data["choices"] is! List ||
-          data["choices"].isEmpty) {
-        throw Exception('Invalid API Response: "choices" not found or empty.');
-      }
-
-      final reply = data["choices"][0]["message"]["content"];
-
-      setState(() {
-        _message.add({"role": "assistant", "content": reply});
-      });
     } catch (e) {
-      setState(() {
-        _message.add({
+      setState(
+        () => _message.add({
           "role": "assistant",
-          "content": "Terjadi Error: ${e.toString()}",
-        });
-      });
+          "content": "Maaf, silakan coba lagi nanti.",
+        }),
+      );
     }
-
-    setState(() {
-      _isloading = false;
-    });
+    setState(() => _isloading = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF2F5F7),
+      // 1. APP BAR (TEAL TUA & KUNING)
       appBar: AppBar(
-        // Mengubah warna AppBar
-        backgroundColor: primaryColor,
-        iconTheme: const IconThemeData(color: Colors.white),
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            backgroundColor: Colors.white.withOpacity(0.2),
-            child: const Icon(
-              Icons.psychology_outlined,
-              color: Colors.white,
-              size: 20,
-            ),
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+            size: 20,
           ),
+          onPressed: () => Navigator.pop(context),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "AI Chatbot",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            Text(
-              "Online",
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.greenAccent.shade400,
-              ),
-            ),
-          ],
+        title: Text(
+          "AI TOUR GUIDE",
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.white,
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.white),
+            // Menggunakan warna ACCENT (ORANYE) untuk hapus chat agar terlihat penting
+            icon: const Icon(
+              Icons.delete_sweep_rounded,
+              color: AppColors.highlight,
+            ),
             onPressed: _clearChat,
           ),
         ],
       ),
       body: Column(
         children: [
+          // 2. HEADER INFO (TEAL MUDA & KUNING)
           Container(
-            padding: const EdgeInsets.symmetric(
-              vertical: 8.0,
-              horizontal: 12.0,
-            ),
-            decoration: BoxDecoration(
+            width: double.infinity,
+            padding: const EdgeInsets.all(15),
+            decoration: const BoxDecoration(
               color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  spreadRadius: 1,
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
             ),
             child: Row(
               children: [
-                Lottie.asset(
-                  'assets/lottie/chatbot.json',
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
-                  repeat: true,
-                ),
-                const SizedBox(width: 10),
-                const Text(
-                  "AI is Ready to Assist You",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: primaryColor, // Mengubah warna teks
+                Container(
+                  height: 55,
+                  width: 55,
+                  decoration: BoxDecoration(
+                    color: AppColors.highlight.withOpacity(0.2), // Aksen KUNING
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.highlight, width: 1),
                   ),
+                  child: Lottie.asset('assets/lottie/chatbot.json'),
+                ),
+                const SizedBox(width: 15),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Pemandu Wisata Digital",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        const CircleAvatar(
+                          radius: 4,
+                          backgroundColor: Colors.green,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          "Aktif Melayani",
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: AppColors.secondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
+
+          // 3. CHAT AREA (MANUAL LIST)
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: const EdgeInsets.all(20),
               itemCount: _message.length,
               itemBuilder: (context, index) {
                 final msg = _message[index];
                 final isUser = msg["role"] == "user";
 
-                return _buildMessage(msg["content"] ?? '', isUser);
+                return Align(
+                  alignment: isUser
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 15),
+                    padding: const EdgeInsets.all(15),
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.75,
+                    ),
+                    decoration: BoxDecoration(
+                      // USER: TEAL TUA, AI: TEAL MUDA
+                      color: isUser ? AppColors.primary : Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(15),
+                        topRight: const Radius.circular(15),
+                        bottomLeft: Radius.circular(isUser ? 15 : 0),
+                        bottomRight: Radius.circular(isUser ? 0 : 15),
+                      ),
+                      border: isUser
+                          ? null
+                          : Border.all(
+                              color: AppColors.secondary.withOpacity(0.3),
+                            ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.03),
+                          blurRadius: 5,
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      msg["content"] ?? '',
+                      style: GoogleFonts.inter(
+                        color: isUser ? Colors.white : Colors.black87,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
           ),
+
+          // 4. LOADING INDICATOR (ORANYE)
           if (_isloading)
             const Padding(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
               child: LinearProgressIndicator(
-                color: primaryColor, // Mengubah warna loading
-                backgroundColor: Colors.black12,
+                color: AppColors.accent,
+                backgroundColor: Color(0xFFE0E0E0),
               ),
             ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
+
+          // 5. INPUT BAR (TEAL MUDA & ORANYE)
+          Container(
+            padding: const EdgeInsets.fromLTRB(15, 10, 15, 25),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    decoration: BoxDecoration(
+                      color: AppColors.secondary.withOpacity(
+                        0.05,
+                      ), // Aksen TEAL MUDA
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(
+                        color: AppColors.secondary.withOpacity(0.2),
+                      ),
+                    ),
                     child: TextField(
                       controller: _controller,
-                      style: const TextStyle(color: Colors.black87),
-                      decoration: InputDecoration(
-                        hintText: "Berikan pertanyaan anda?",
-                        hintStyle: TextStyle(color: Colors.grey.shade500),
-                        filled: true,
-                        fillColor: Colors.grey.shade100,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 15,
-                        ),
+                      decoration: const InputDecoration(
+                        hintText: "Tanyakan pantai Babel...",
+                        border: InputBorder.none,
                       ),
                       onSubmitted: sendMessage,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Container(
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () => sendMessage(_controller.text),
+                  child: Container(
+                    height: 50,
+                    width: 50,
                     decoration: const BoxDecoration(
-                      color: primaryColor, // Mengubah warna tombol kirim
+                      color:
+                          AppColors.accent, // Aksen ORANYE untuk tombol kirim
                       shape: BoxShape.circle,
                     ),
-                    child: IconButton(
-                      icon: const Icon(Icons.send_rounded, color: Colors.white),
-                      onPressed: () => sendMessage(_controller.text),
+                    child: const Icon(
+                      Icons.send_rounded,
+                      color: Colors.white,
+                      size: 22,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildMessage(String content, bool isUser) {
-    final textColor = isUser ? Colors.white : Colors.black87;
-    final bubbleColor = isUser
-        ? primaryColor
-        : Colors.grey.shade200; // Mengubah warna bubble user
-
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Card(
-        elevation: 2,
-        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(18),
-            topRight: const Radius.circular(18),
-            bottomLeft: isUser
-                ? const Radius.circular(18)
-                : const Radius.circular(4),
-            bottomRight: isUser
-                ? const Radius.circular(4)
-                : const Radius.circular(18),
-          ),
-        ),
-        color: bubbleColor,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (!isUser)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: CircleAvatar(
-                    backgroundColor: primaryColor, // Menggunakan Primary Color
-                    radius: 12,
-                    child: const Icon(
-                      Icons.psychology_outlined,
-                      color: Colors.white,
-                      size: 14,
-                    ),
-                  ),
-                ),
-              Flexible(
-                child: Text(
-                  content,
-                  textAlign: TextAlign.justify,
-                  style: TextStyle(fontSize: 16, color: textColor),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

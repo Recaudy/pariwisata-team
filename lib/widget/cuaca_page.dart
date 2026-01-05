@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import '../models/cuaca_model.dart';
 import '../services/api_service.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+// 4 WARNA UTAMA APLIKASI
+class AppColors {
+  static const Color primary = Color(0xFF21899C); // Teal Tua
+  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
+  static const Color accent = Color(0xFFF56B3F); // Oranye
+  static const Color highlight = Color(0xFFF9CA58); // Kuning Cerah
+}
 
 class WeatherPage extends StatefulWidget {
   const WeatherPage({super.key});
@@ -30,244 +39,277 @@ class _WeatherPageState extends State<WeatherPage> {
     _weatherFuture = _apiService.fetchAllCuaca();
   }
 
-  Widget _buildBMKGIcon(String url, {double size = 50}) {
-    return Image.network(
-      url,
-      width: size,
-      height: size,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) =>
-          Icon(Icons.wb_cloudy_outlined, color: Colors.white, size: size),
-    );
-  }
-
-  String _formatTime(String dateTimeStr) {
-    try {
-      return DateFormat('HH:mm').format(DateTime.parse(dateTimeStr));
-    } catch (e) {
-      return "--:--";
+  // LOGIKA PENGGANTI GAMBAR: MENGGUNAKAN IKON BERDASARKAN TEKS CUACA
+  Widget _getWeatherIcon(
+    String weatherDesc, {
+    double size = 50,
+    Color color = Colors.white,
+  }) {
+    String desc = weatherDesc.toLowerCase();
+    if (desc.contains('cerah') && !desc.contains('berawan')) {
+      return Icon(
+        Icons.wb_sunny_rounded,
+        size: size,
+        color: AppColors.highlight,
+      );
+    } else if (desc.contains('hujan')) {
+      return Icon(Icons.umbrella_rounded, size: size, color: color);
+    } else if (desc.contains('berawan')) {
+      return Icon(Icons.cloud_rounded, size: size, color: color);
+    } else if (desc.contains('petir')) {
+      return Icon(Icons.thunderstorm_rounded, size: size, color: color);
+    } else {
+      return Icon(Icons.wb_cloudy_rounded, size: size, color: color);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      backgroundColor: const Color(0xFFF2F5F7),
       appBar: AppBar(
-        title: const Text(
-          "Perkiraan Cuaca",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.primary,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF21899C), Color(0xFF155E6B), Colors.black],
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+            size: 20,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          "INFO CUACA BABEL",
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.white,
           ),
         ),
-        child: FutureBuilder<List<CuacaModel>>(
-          future: _weatherFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(color: Colors.white),
-              );
-            }
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(
-                child: Text(
-                  "Data tidak tersedia",
-                  style: TextStyle(color: Colors.white),
-                ),
-              );
-            }
+      ),
+      body: FutureBuilder<List<CuacaModel>>(
+        future: _weatherFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("Data Cuaca Tidak Ditemukan"));
+          }
 
-            List<CuacaModel> rawData = snapshot.data!;
-            List<CuacaModel> displayData = [];
+          List<CuacaModel> rawData = snapshot.data!;
+          List<CuacaModel> displayData = [];
 
-            if (_selectedLocation == 'Semua') {
-              // Jika "Semua", ambil 1 data paling mendekati sekarang untuk setiap kabupaten
-              for (var locName in ApiService.locations.keys) {
-                var locData = rawData
-                    .where((e) => e.locationName == locName)
-                    .toList();
-                if (locData.isNotEmpty) {
-                  // Cari yang paling dekat dengan jam sekarang
-                  DateTime now = DateTime.now();
-                  locData.sort(
-                    (a, b) =>
-                        (DateTime.parse(
-                          a.localDatetime,
-                        ).difference(now).inMinutes.abs()).compareTo(
-                          DateTime.parse(
-                            b.localDatetime,
-                          ).difference(now).inMinutes.abs(),
-                        ),
-                  );
-                  displayData.add(locData.first);
-                }
-              }
-            } else {
-              // Jika Kabupaten dipilih, tampilkan SEMUA jam untuk kabupaten tersebut
-              displayData = rawData
-                  .where((e) => e.locationName == _selectedLocation)
+          if (_selectedLocation == 'Semua') {
+            for (var locName in ApiService.locations.keys) {
+              var locData = rawData
+                  .where((e) => e.locationName == locName)
                   .toList();
-              // Urutkan berdasarkan waktu
-              displayData.sort(
-                (a, b) => a.localDatetime.compareTo(b.localDatetime),
-              );
+              if (locData.isNotEmpty) {
+                DateTime now = DateTime.now();
+                locData.sort(
+                  (a, b) =>
+                      (DateTime.parse(
+                        a.localDatetime,
+                      ).difference(now).inMinutes.abs()).compareTo(
+                        DateTime.parse(
+                          b.localDatetime,
+                        ).difference(now).inMinutes.abs(),
+                      ),
+                );
+                displayData.add(locData.first);
+              }
             }
+          } else {
+            displayData = rawData
+                .where((e) => e.locationName == _selectedLocation)
+                .toList();
+            displayData.sort(
+              (a, b) => a.localDatetime.compareTo(b.localDatetime),
+            );
+          }
 
-            final current = displayData.first;
+          final current = displayData.first;
 
-            return SafeArea(
-              child: Column(
-                children: [
-                  // Chips Filter
-                  SizedBox(
-                    height: 50,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      itemCount: _filterOptions.length,
-                      itemBuilder: (context, index) {
-                        bool isSelected =
-                            _selectedLocation == _filterOptions[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          child: ChoiceChip(
-                            label: Text(_filterOptions[index]),
-                            selected: isSelected,
-                            onSelected: (val) => setState(
+          return Column(
+            children: [
+              // HEADER AREA (TEAL GRADIENT)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppColors.primary, AppColors.secondary],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // FILTER CHIPS
+                    SizedBox(
+                      height: 40,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _filterOptions.length,
+                        itemBuilder: (context, index) {
+                          bool isSelected =
+                              _selectedLocation == _filterOptions[index];
+                          return GestureDetector(
+                            onTap: () => setState(
                               () => _selectedLocation = _filterOptions[index],
                             ),
-                            selectedColor: const Color(0xFF21899C),
-                            labelStyle: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: () async {
-                        setState(() {
-                          _weatherFuture = _apiService.fetchAllCuaca();
-                        });
-                      },
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 20),
-                            Text(
-                              current.locationName,
-                              style: const TextStyle(
-                                fontSize: 28,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 10),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 18,
                               ),
-                            ),
-                            Text(
-                              _selectedLocation == 'Semua'
-                                  ? "Kondisi Saat Ini"
-                                  : "Prakiraan Per Jam",
-                              style: const TextStyle(color: Colors.white70),
-                            ),
-                            const SizedBox(height: 30),
-                            _buildBMKGIcon(current.imageUrl, size: 120),
-                            Text(
-                              "${current.temperature}°C",
-                              style: const TextStyle(
-                                fontSize: 60,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w200,
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? AppColors.highlight
+                                    : Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                            ),
-                            Text(
-                              current.weatherDesc,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const SizedBox(height: 40),
-                            Align(
-                              alignment: Alignment.centerLeft,
+                              alignment: Alignment.center,
                               child: Text(
-                                _selectedLocation == 'Semua'
-                                    ? "Wilayah Bangka Belitung"
-                                    : "Jadwal Waktu",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                                _filterOptions[index],
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: isSelected
+                                      ? AppColors.primary
+                                      : Colors.white,
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 15),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: displayData.length,
-                              itemBuilder: (context, index) {
-                                final item = displayData[index];
-                                return Container(
-                                  margin: const EdgeInsets.only(bottom: 10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  child: ListTile(
-                                    leading: _buildBMKGIcon(
-                                      item.imageUrl,
-                                      size: 40,
-                                    ),
-                                    title: Text(
-                                      _selectedLocation == 'Semua'
-                                          ? item.locationName
-                                          : _formatTime(item.localDatetime),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      item.weatherDesc,
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                      ),
-                                    ),
-                                    trailing: Text(
-                                      "${item.temperature}°",
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 30),
+                    Text(
+                      current.locationName,
+                      style: GoogleFonts.poppins(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+
+                    // MENGGUNAKAN IKON MANUAL (BUKAN IMAGE)
+                    _getWeatherIcon(current.weatherDesc, size: 100),
+
+                    const SizedBox(height: 10),
+                    Text(
+                      "${current.temperature}°C",
+                      style: GoogleFonts.poppins(
+                        fontSize: 60,
+                        fontWeight: FontWeight.w200,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      current.weatherDesc.toUpperCase(),
+                      style: GoogleFonts.inter(
+                        letterSpacing: 2,
+                        color: Colors.white.withOpacity(0.8),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            );
-          },
-        ),
+
+              // DAFTAR WILAYAH/WAKTU
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(20),
+                  itemCount: displayData.length,
+                  itemBuilder: (context, index) {
+                    final item = displayData[index];
+                    String timeLabel;
+                    try {
+                      timeLabel = DateFormat(
+                        'HH:mm',
+                      ).format(DateTime.parse(item.localDatetime));
+                    } catch (e) {
+                      timeLabel = "--:--";
+                    }
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          // IKON CUACA MANUAL
+                          _getWeatherIcon(
+                            item.weatherDesc,
+                            size: 35,
+                            color: AppColors.secondary,
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _selectedLocation == 'Semua'
+                                      ? item.locationName
+                                      : "Pukul $timeLabel WIB",
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                                Text(
+                                  item.weatherDesc,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            "${item.temperature}°",
+                            style: GoogleFonts.poppins(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.accent,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

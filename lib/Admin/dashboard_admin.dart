@@ -8,7 +8,7 @@ import '../services/komentar_service.dart';
 import 'wisata_form_page.dart';
 import 'Komentar_page.dart';
 import 'wisata_list_page.dart';
-import 'ratinglist_page.dart'; // Import halaman rating
+import 'ratinglist_page.dart'; 
 
 // TEMA WARNA (Tetap Konsisten)
 class AppColors {
