@@ -7,9 +7,9 @@ import '../models/wisata_model.dart';
 
 // Tema Warna Konsisten
 class AppColors {
-  static const Color primary   = Color(0xFF21899C); // Teal Tua
+  static const Color primary = Color(0xFF21899C); // Teal Tua
   static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
-  static const Color accent    = Color(0xFFF56B3F); // Oranye
+  static const Color accent = Color(0xFFF56B3F); // Oranye
   static const Color highlight = Color(0xFFF9CA58); // Kuning
 }
 
@@ -149,8 +149,10 @@ class _WisataFormPageState extends State<WisataFormPage> {
               ),
             ),
             const SizedBox(height: 5),
-            const Text("Lengkapi formulir di bawah ini untuk mengelola data wisata", 
-              style: TextStyle(color: Colors.grey, fontSize: 13)),
+            const Text(
+              "Lengkapi formulir di bawah ini untuk mengelola data wisata",
+              style: TextStyle(color: Colors.grey, fontSize: 13),
+            ),
             const SizedBox(height: 25),
 
             // Form Input Area (WIDGET DASAR LINIER)
@@ -160,89 +162,131 @@ class _WisataFormPageState extends State<WisataFormPage> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 5)),
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
                 ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Nama Wisata
-                  const Text("Nama Wisata", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const Text(
+                    "Nama Wisata",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: namaController,
                     decoration: InputDecoration(
                       hintText: "Contoh: Pantai Tanjung Tinggi",
                       filled: true,
-                      fillColor: Colors.grey[50],
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      fillColor: Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
 
                   // Lokasi
-                  const Text("Lokasi", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const Text(
+                    "Lokasi",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: subJudulController,
                     decoration: InputDecoration(
                       hintText: "Contoh: Belitung Sijuk",
                       filled: true,
-                      fillColor: Colors.grey[50],
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      fillColor: Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
 
                   // Dropdown Kategori
-                  const Text("Kategori", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const Text(
+                    "Kategori",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
                     value: selectedKategori,
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: Colors.grey[50],
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      fillColor: Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                     items: kategoriMap.entries.map((e) {
-                      return DropdownMenuItem(value: e.key, child: Text(e.value));
+                      return DropdownMenuItem(
+                        value: e.key,
+                        child: Text(e.value),
+                      );
                     }).toList(),
-                    onChanged: (value) => setState(() => selectedKategori = value!),
+                    onChanged: (value) =>
+                        setState(() => selectedKategori = value!),
                   ),
                   const SizedBox(height: 20),
 
                   // Deskripsi
-                  const Text("Deskripsi Singkat", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const Text(
+                    "Deskripsi Singkat",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: descController,
                     maxLines: 3,
                     decoration: InputDecoration(
-                      hintText: "Ceritakan sedikit tentang keindahan tempat ini...",
+                      hintText:
+                          "Ceritakan sedikit tentang keindahan tempat ini...",
                       filled: true,
-                      fillColor: Colors.grey[50],
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      fillColor: Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
 
                   // Sejarah
-                  const Text("Sejarah", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const Text(
+                    "Sejarah",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: sejarahController,
                     maxLines: 4,
                     decoration: InputDecoration(
-                      hintText: "Asal usul atau sejarah tempat ini...",
+                      hintText: "Asal usul atau sejarah tempat ini",
                       filled: true,
-                      fillColor: Colors.grey[50],
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      fillColor: Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 25),
 
                   // Image Picker Area
-                  const Text("Foto Destinasi", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const Text(
+                    "Foto Destinasi",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
                   const SizedBox(height: 10),
                   GestureDetector(
                     onTap: _pickImage,
@@ -252,19 +296,35 @@ class _WisataFormPageState extends State<WisataFormPage> {
                       decoration: BoxDecoration(
                         color: Colors.grey[100],
                         borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Colors.grey.shade300, width: 2),
+                        border: Border.all(
+                          color: Colors.grey.shade300,
+                          width: 2,
+                        ),
                       ),
                       child: selectedImage != null
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(13),
-                              child: Image.file(selectedImage!, fit: BoxFit.cover),
+                              child: Image.file(
+                                selectedImage!,
+                                fit: BoxFit.cover,
+                              ),
                             )
                           : Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.add_photo_alternate_rounded, size: 50, color: AppColors.secondary),
+                                const Icon(
+                                  Icons.add_photo_alternate_rounded,
+                                  size: 50,
+                                  color: AppColors.secondary,
+                                ),
                                 const SizedBox(height: 8),
-                                Text("Klik untuk pilih foto", style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                                Text(
+                                  "Klik untuk pilih foto",
+                                  style: TextStyle(
+                                    color: Colors.grey[500],
+                                    fontSize: 13,
+                                  ),
+                                ),
                               ],
                             ),
                     ),
@@ -282,12 +342,19 @@ class _WisataFormPageState extends State<WisataFormPage> {
                 onPressed: _simpan,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accent,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                   elevation: 5,
                 ),
                 child: Text(
                   widget.wisata == null ? 'KIRIM DATA' : 'SIMPAN PERUBAHAN',
-                  style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 1),
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 1,
+                  ),
                 ),
               ),
             ),

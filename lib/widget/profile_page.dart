@@ -7,8 +7,10 @@ import '../services/auth_service.dart';
 
 // SKEMA WARNA BARU
 const Color mainColor = Color(0xFF21899C); // Tosca
-const Color subColor = Color(0xFFE6F4F6);  // Biru Muda (Background)
-const Color fieldFillColor = Color(0xFFF0F9FA); // Warna isi input yang lebih lembut
+const Color subColor = Color(0xFFE6F4F6); // Biru Muda (Background)
+const Color fieldFillColor = Color(
+  0xFFF0F9FA,
+); // Warna isi input yang lebih lembut
 
 class InformasiProfil extends StatefulWidget {
   final UserModel user;
@@ -190,8 +192,8 @@ class _InformasiProfilState extends State<InformasiProfil> {
                             color: mainColor.withOpacity(0.2),
                             blurRadius: 10,
                             spreadRadius: 2,
-                          )
-                        ]
+                          ),
+                        ],
                       ),
                       child: CircleAvatar(
                         radius: 70,
@@ -261,7 +263,9 @@ class _InformasiProfilState extends State<InformasiProfil> {
                     backgroundColor: mainColor,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15), // Lebih kotak tapi tetap melengkung
+                      borderRadius: BorderRadius.circular(
+                        15,
+                      ), // Lebih kotak tapi tetap melengkung
                     ),
                     elevation: 4,
                     shadowColor: mainColor.withOpacity(0.4),
@@ -313,8 +317,8 @@ class _InformasiProfilState extends State<InformasiProfil> {
           readOnly: readOnly,
           obscureText: isPassword && !_showPassword,
           style: TextStyle(
-            color: readOnly ? Colors.grey[600] : Colors.black87, 
-            fontSize: 16
+            color: readOnly ? Colors.grey[600] : Colors.black87,
+            fontSize: 16,
           ),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: mainColor),
