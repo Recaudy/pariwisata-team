@@ -18,9 +18,13 @@ class _ChatPageState extends State<ChatPage> {
   final List<Map<String, String>> _message = [];
   bool _isloading = false;
 
-  final String apiKey =
-      "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";
-  final String modelName = "openai/gpt-3.5-turbo";
+  // --- BAGIAN YANG DIPERBARUI (API KEY) ---
+  final String apiKey = "sk-qz1-zMuj5405dY1rB2ao-w";
+  
+  // Pastikan nama model ini didukung oleh server LiteLLM Anda. 
+  // Jika server menggunakan default, Anda mungkin tidak perlu mengubah ini, 
+  // atau bisa diganti sesuai model yang tersedia di server tersebut.
+  final String modelName = "openai/gpt-3.5-turbo"; 
 
   void _clearChat() {
     setState(() {
@@ -39,7 +43,8 @@ class _ChatPageState extends State<ChatPage> {
 
     try {
       final response = await http.post(
-        Uri.parse("https://openrouter.ai/api/v1/chat/completions"),
+        // --- BAGIAN YANG DIPERBARUI (URL) ---
+        Uri.parse("https://litellm.koboi2026.biz.id/v1/chat/completions"),
         headers: {
           "Authorization": "Bearer $apiKey",
           "Content-Type": "application/json",
