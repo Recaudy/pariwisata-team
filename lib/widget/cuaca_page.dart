@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_uts_pariwisata/components/custom_drawer.dart';
 import '../models/cuaca_model.dart';
 import '../services/api_service.dart';
 import 'package:intl/intl.dart';
@@ -80,7 +81,7 @@ class _WeatherPageState extends State<WeatherPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "INFO CUACA BABEL",
+          "INFO CUACA BANGKA BELITUNG",
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -303,10 +304,29 @@ class _WeatherPageState extends State<WeatherPage> {
                           ),
                         ],
                       ),
+
                     );
                   },
                 ),
               ),
+              Container(
+                margin: EdgeInsets.all(20),
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Color(0xFF21899C),
+                  borderRadius: BorderRadius.circular(10)
+                ),
+                child: Center(
+                  child: Text(
+                    'Anda Bisa melihat informasi cuaca saat ini supaya perjalanan anda tetap nyaman',
+                    textAlign: TextAlign.justify,
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: Colors.white,
+                    ),
+                    )
+                    ),
+              )
             ],
           );
         },

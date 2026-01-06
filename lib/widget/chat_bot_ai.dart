@@ -96,10 +96,10 @@ class _ChatPageState extends State<ChatPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "AI TOUR GUIDE",
+          "Assistant AI Wisata Bangka Belitung",
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
-            fontSize: 16,
+            fontSize: 13,
             color: Colors.white,
           ),
         ),
@@ -107,7 +107,7 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(
             // Menggunakan warna ACCENT (ORANYE) untuk hapus chat agar terlihat penting
             icon: const Icon(
-              Icons.delete_sweep_rounded,
+              Icons.delete,
               color: AppColors.highlight,
             ),
             onPressed: _clearChat,
@@ -130,13 +130,9 @@ class _ChatPageState extends State<ChatPage> {
             child: Row(
               children: [
                 Container(
-                  height: 55,
-                  width: 55,
-                  decoration: BoxDecoration(
-                    color: AppColors.highlight.withOpacity(0.2), // Aksen KUNING
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.highlight, width: 1),
-                  ),
+                  height: 95,
+                  width: 75,
+
                   child: Lottie.asset('assets/lottie/chatbot.json'),
                 ),
                 const SizedBox(width: 15),
@@ -144,28 +140,14 @@ class _ChatPageState extends State<ChatPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Pemandu Wisata Digital",
+                      "Anda bisa bertanya seputar destinasi wisata",
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
+                        fontSize: 10,
                         color: AppColors.primary,
                       ),
                     ),
-                    Row(
-                      children: [
-                        const CircleAvatar(
-                          radius: 4,
-                          backgroundColor: Colors.green,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          "Aktif Melayani",
-                          style: GoogleFonts.inter(
-                            fontSize: 11,
-                            color: AppColors.secondary,
-                          ),
-                        ),
-                      ],
-                    ),
+                   
                   ],
                 ),
               ],

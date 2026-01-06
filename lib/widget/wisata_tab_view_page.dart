@@ -25,7 +25,6 @@ class WisataTabViewPage extends StatelessWidget {
         backgroundColor: const Color(0xFFF2F5F7),
         body: Column(
           children: [
-            // 1. HEADER MELENGKUNG MANUAL (Warna Teal Tua)
             Stack(
               children: [
                 Container(
@@ -49,30 +48,24 @@ class WisataTabViewPage extends StatelessWidget {
                           vertical: 5,
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            IconButton(
-                              icon: const Icon(
-                                Icons.arrow_back_ios_new,
-                                color: Colors.white,
-                                size: 20,
+                          SizedBox(height: 15),
+                            Center(
+                              child: Text(
+                                "DESTINASI WISATA",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  letterSpacing: 1.1,
+                                ),
                               ),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            Text(
-                              "DESTINASI WISATA",
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                letterSpacing: 1.1,
-                              ),
-                            ),
-                            const SizedBox(width: 48), // Penyeimbang
+                            ),// Penyeimbang
                           ],
                         ),
                       ),
-                      // Animasi Lottie & Subtitle
+                        SizedBox(height: 15),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -81,13 +74,15 @@ class WisataTabViewPage extends StatelessWidget {
                             height: 70,
                             repeat: true,
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 30),
+                          SizedBox(height: 40),
                           Flexible(
                             child: Text(
                               "Temukan tempat favoritmu\ndi Bangka Belitung",
-                              style: GoogleFonts.inter(
+                              textAlign: TextAlign.justify,
+                              style: GoogleFonts.poppins(
                                 color: Colors.white.withOpacity(0.9),
-                                fontSize: 13,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),

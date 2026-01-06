@@ -28,7 +28,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // Drawer harus terpasang di Scaffold agar bisa dipanggil
       drawer: const CustomDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -37,7 +36,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // MENGGUNAKAN BUILDER SUPAYA DRAWER BISA DIKLIK/DIBUKA
             Builder(
               builder: (context) => InkWell(
                 onTap: () => Scaffold.of(context).openDrawer(),
@@ -64,24 +62,22 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
-
-                  // TAMBAHAN TEKS DESKRIPSI DI ATAS SEARCHING
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Halo Traveler,",
+                          "Halo Traveler",
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             color: Colors.black54,
                           ),
                         ),
                         Text(
-                          "Mau explore kemana hari ini?",
+                          "Jelajahi keindahan Bangka Belitung",
                           style: GoogleFonts.poppins(
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: primaryColor,
                           ),
@@ -90,7 +86,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
 
                   // 1. SEARCH BAR (MANUAL)
                   Padding(
@@ -115,7 +111,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         onChanged: (value) =>
                             setState(() => searchQuery = value.toLowerCase()),
                         decoration: InputDecoration(
-                          hintText: "Cari destinasi wisata...",
+                          hintText: "Cari destinasi wisata",
                           border: InputBorder.none,
                           prefixIcon: Icon(Icons.search, color: primaryColor),
                           suffixIcon: searchQuery.isNotEmpty
@@ -226,7 +222,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                   ),
                                 ),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(15),
@@ -240,11 +236,11 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                                   fit: BoxFit.cover,
                                                   errorBuilder: (c, e, s) =>
                                                       Container(
-                                                    color: Colors.grey[200],
-                                                    child: const Icon(
-                                                      Icons.broken_image,
-                                                    ),
-                                                  ),
+                                                        color: Colors.grey[200],
+                                                        child: const Icon(
+                                                          Icons.broken_image,
+                                                        ),
+                                                      ),
                                                 )
                                               : Image.asset(
                                                   imgUrl,
@@ -253,11 +249,11 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                                   fit: BoxFit.cover,
                                                   errorBuilder: (c, e, s) =>
                                                       Container(
-                                                    color: Colors.grey[200],
-                                                    child: const Icon(
-                                                      Icons.image,
-                                                    ),
-                                                  ),
+                                                        color: Colors.grey[200],
+                                                        child: const Icon(
+                                                          Icons.image,
+                                                        ),
+                                                      ),
                                                 ),
                                           Positioned(
                                             top: 10,
@@ -474,7 +470,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     ),
                   ),
 
-                  // 5. QUICK MENU (PERBAIKAN TAMPILAN - MANUAL LINIER)
                   const SizedBox(height: 25),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -497,28 +492,30 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                               onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => const ChatPage()),
+                                  builder: (_) => const ChatPage(),
+                                ),
                               ),
                               child: Container(
-                                width:
-                                    MediaQuery.of(context).size.width * 0.27,
+                                width: MediaQuery.of(context).size.width * 0.27,
                                 child: Column(
                                   children: [
                                     Container(
                                       height: 60,
                                       width: 60,
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF21899C)
-                                            .withOpacity(0.1),
-                                        borderRadius:
-                                            BorderRadius.circular(15),
-                                            boxShadow: [
-                                              BoxShadow(
-      color:const Color(0xFF21899C).withOpacity(0.12),
-      blurRadius: 18,
-      offset: const Offset(0, 8),
-    ),
-                                            ]
+                                        color: const Color(
+                                          0xFF21899C,
+                                        ).withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(15),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(
+                                              0xFF21899C,
+                                            ).withOpacity(0.12),
+                                            blurRadius: 18,
+                                            offset: const Offset(0, 8),
+                                          ),
+                                        ],
                                       ),
                                       child: const Icon(
                                         Icons.auto_awesome,
@@ -528,13 +525,14 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      "Tanya AI",
+                                      "Assistant AI",
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
-                                        color: const Color(0xFF21899C)
-                                            .withOpacity(0.8),
+                                        color: const Color(
+                                          0xFF21899C,
+                                        ).withOpacity(0.8),
                                       ),
                                     ),
                                   ],
@@ -546,21 +544,21 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                               onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => const MapsPage()),
+                                  builder: (_) => const MapsPage(),
+                                ),
                               ),
                               child: Container(
-                                width:
-                                    MediaQuery.of(context).size.width * 0.27,
+                                width: MediaQuery.of(context).size.width * 0.27,
                                 child: Column(
                                   children: [
                                     Container(
                                       height: 60,
                                       width: 60,
                                       decoration: BoxDecoration(
-                                        color:const Color(0xFF21899C)
-                                            .withOpacity(0.1),
-                                        borderRadius:
-                                            BorderRadius.circular(15),
+                                        color: const Color(
+                                          0xFF21899C,
+                                        ).withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(15),
                                       ),
                                       child: const Icon(
                                         Icons.map_outlined,
@@ -575,8 +573,9 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
-                                        color: const Color(0xFF21899C)
-                                            .withOpacity(0.8),
+                                        color: const Color(
+                                          0xFF21899C,
+                                        ).withOpacity(0.8),
                                       ),
                                     ),
                                   ],
@@ -588,20 +587,21 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                               onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => const WeatherPage()),
+                                  builder: (_) => const WeatherPage(),
+                                ),
                               ),
                               child: Container(
-                                width:
-                                    MediaQuery.of(context).size.width * 0.27,
+                                width: MediaQuery.of(context).size.width * 0.27,
                                 child: Column(
                                   children: [
                                     Container(
                                       height: 60,
                                       width: 60,
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF21899C).withOpacity(0.1),
-                                        borderRadius:
-                                            BorderRadius.circular(15),
+                                        color: const Color(
+                                          0xFF21899C,
+                                        ).withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(15),
                                       ),
                                       child: const Icon(
                                         Icons.wb_sunny_outlined,
@@ -616,7 +616,9 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
-                                        color: const Color(0xFF21899C).withOpacity(0.8),
+                                        color: const Color(
+                                          0xFF21899C,
+                                        ).withOpacity(0.8),
                                       ),
                                     ),
                                   ],
@@ -632,8 +634,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                 ],
               ),
             ),
-
-            // 6. SEARCH DROPDOWN OVERLAY (MANUAL - IMAGE DIHILANGKAN)
             if (searchQuery.isNotEmpty)
               Positioned(
                 top: 75,

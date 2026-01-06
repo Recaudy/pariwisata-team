@@ -27,7 +27,7 @@ class _InformasiProfilState extends State<InformasiProfil> {
 
   // Warna Utama Konsisten
   final Color primaryColor = const Color(0xFF21899C);
-   final Color accent = const Color(0xFFF56B3F); 
+  final Color accent = const Color(0xFFF56B3F);
 
   @override
   void initState() {
@@ -58,7 +58,9 @@ class _InformasiProfilState extends State<InformasiProfil> {
   Future<void> _updateProfilePicture() async {
     if (_newProfileImageFile == null) return;
     setState(() => _isLoading = true);
-    final res = await _authService.uploadProfilePicture(_newProfileImageFile!.path);
+    final res = await _authService.uploadProfilePicture(
+      _newProfileImageFile!.path,
+    );
 
     if (mounted) {
       if (res != null && !res.startsWith("Firebase")) {
@@ -70,9 +72,9 @@ class _InformasiProfilState extends State<InformasiProfil> {
           const SnackBar(content: Text('Foto profil diperbarui!')),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mengunggah foto: $res')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Gagal mengunggah foto: $res')));
       }
       setState(() => _isLoading = false);
     }
@@ -99,9 +101,9 @@ class _InformasiProfilState extends State<InformasiProfil> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -114,7 +116,8 @@ class _InformasiProfilState extends State<InformasiProfil> {
     ImageProvider profileImg;
     if (_newProfileImageFile != null) {
       profileImg = FileImage(_newProfileImageFile!);
-    } else if (widget.user.photoUrl != null && widget.user.photoUrl!.isNotEmpty) {
+    } else if (widget.user.photoUrl != null &&
+        widget.user.photoUrl!.isNotEmpty) {
       profileImg = NetworkImage(widget.user.photoUrl!);
     } else {
       profileImg = const AssetImage("assets/images/profil.jpg");
@@ -125,7 +128,7 @@ class _InformasiProfilState extends State<InformasiProfil> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // --- HEADER MELENGKUNG (SAMA DENGAN DASHBOARD) ---
+            // --- HEADER MELENGKUNG ---
             Stack(
               children: [
                 Container(
@@ -143,24 +146,23 @@ class _InformasiProfilState extends State<InformasiProfil> {
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Row(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        child: Stack( // MENGGUNAKAN STACK AGAR JUDUL BENAR-BENAR DI TENGAH
+                          alignment: Alignment.center,
                           children: [
-                            const Spacer(),
                             Text(
                               "Edit Profil",
+                              textAlign: TextAlign.center,
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
                             ),
-                            const Spacer(),
-                            const SizedBox(width: 48), // Penyeimbang Leading
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       // FOTO PROFIL MANUAL
                       Center(
                         child: Stack(
@@ -177,6 +179,7 @@ class _InformasiProfilState extends State<InformasiProfil> {
                                 backgroundImage: profileImg,
                               ),
                             ),
+                            SizedBox(height: 20),
                             Positioned(
                               bottom: 0,
                               right: 0,
@@ -187,12 +190,20 @@ class _InformasiProfilState extends State<InformasiProfil> {
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFF9CA58), // Warna Highlight Kuning
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white, width: 2),
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 1,
+                                    ),
                                   ),
-                                  child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    size: 15,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
+                              SizedBox(height: 40),
                           ],
                         ),
                       ),
@@ -201,8 +212,7 @@ class _InformasiProfilState extends State<InformasiProfil> {
                 ),
               ],
             ),
-
-            // --- FORM INPUT MANUAL ---
+            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.all(25),
               child: Form(
@@ -211,20 +221,34 @@ class _InformasiProfilState extends State<InformasiProfil> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // INPUT NAMA
-                    Text("Nama Lengkap", style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: primaryColor)),
-                    const SizedBox(height: 8),
+                    Text(
+                      "Nama Lengkap",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        color: primaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
-                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                          ),
+                        ],
                       ),
                       child: TextFormField(
                         controller: _nameController,
                         decoration: const InputDecoration(
                           border: InputBorder.none,
-                          icon: Icon(Icons.person_outline, color: Color(0xFF4DA1B0)),
+                          icon: Icon(
+                            Icons.person_outline,
+                            color: Color(0xFF4DA1B0),
+                          ),
                         ),
                       ),
                     ),
@@ -232,8 +256,14 @@ class _InformasiProfilState extends State<InformasiProfil> {
                     const SizedBox(height: 20),
 
                     // INPUT EMAIL (READ ONLY)
-                    Text("Email", style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: primaryColor)),
-                    const SizedBox(height: 8),
+                    Text(
+                      "Email",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        color: primaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       decoration: BoxDecoration(
@@ -253,24 +283,44 @@ class _InformasiProfilState extends State<InformasiProfil> {
                     const SizedBox(height: 20),
 
                     // INPUT PASSWORD
-                    Text("Password Baru", style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: primaryColor)),
-                    const SizedBox(height: 8),
+                    Text(
+                      "Password Baru",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        color: primaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
-                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                          ),
+                        ],
                       ),
                       child: TextFormField(
                         controller: _passwordController,
                         obscureText: !_showPassword,
                         decoration: InputDecoration(
                           border: InputBorder.none,
-                          icon: const Icon(Icons.lock_outline, color: Color(0xFF4DA1B0)),
+                          icon: const Icon(
+                            Icons.lock_outline,
+                            color: Color(0xFF4DA1B0),
+                          ),
                           suffixIcon: IconButton(
-                            icon: Icon(_showPassword ? Icons.visibility : Icons.visibility_off, size: 20),
-                            onPressed: () => setState(() => _showPassword = !_showPassword),
+                            icon: Icon(
+                              _showPassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              size: 20,
+                            ),
+                            onPressed: () =>
+                                setState(() => _showPassword = !_showPassword),
                           ),
                         ),
                       ),
@@ -297,9 +347,11 @@ class _InformasiProfilState extends State<InformasiProfil> {
                         ),
                         child: Center(
                           child: _isLoading
-                              ? const CircularProgressIndicator(color: Colors.white)
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
                               : Text(
-                                  "UPDATE PROFIL",
+                                  "Edit",
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
