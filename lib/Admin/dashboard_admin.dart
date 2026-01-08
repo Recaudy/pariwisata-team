@@ -58,8 +58,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF2F5F7),
-      appBar: AppBar(elevation: 0, backgroundColor: AppColors.primary),
-
+      appBar: AppBar(
+        title: Text('Selamat Datang di Dashboard Admin',
+        style: GoogleFonts.poppins(
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+          color: Colors.white,
+        ),
+        ),
+        elevation: 0, backgroundColor: AppColors.primary
+        ),
       drawer: Drawer(
         child: Container(
           color: Colors.white,

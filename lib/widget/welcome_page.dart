@@ -21,7 +21,8 @@ class WelcomePage extends StatelessWidget {
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppColors.primary, Color(0xFFE6F4F6)],
+            colors: [AppColors.primary,
+             Color(0xFFE6F4F6)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -37,7 +38,6 @@ class WelcomePage extends StatelessWidget {
             ),
 
             const SizedBox(height: 10),
-
             Text(
               "Jelajahi",
               style: GoogleFonts.poppins(
@@ -54,9 +54,7 @@ class WelcomePage extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(height: 15),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: Text(

@@ -55,7 +55,9 @@ class _WisataListPageState extends State<WisataListPage> {
         backgroundColor: AppColors.primary,
         title: Text(
           kategoriMap[selectedKategori]?.toUpperCase() ?? "WISATA",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold, 
+            fontSize: 18),
         ),
       ),
       body: StreamBuilder<List<WisataModel>>(
@@ -66,9 +68,7 @@ class _WisataListPageState extends State<WisataListPage> {
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
-
           final wisataList = snapshot.data ?? [];
-
           final filteredWisata = selectedKategori == 'all'
               ? wisataList
               : wisataList
@@ -138,7 +138,6 @@ class _WisataListPageState extends State<WisataListPage> {
               ),
 
               const SizedBox(height: 20),
-
               Expanded(
                 child: filteredWisata.isEmpty
                     ? Center(
@@ -265,7 +264,9 @@ class _WisataListPageState extends State<WisataListPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Batal"),
+            child: const Text(
+              "Batal"
+              ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -286,7 +287,12 @@ class _WisataListPageState extends State<WisataListPage> {
                 );
               }
             },
-            child: const Text("Hapus", style: TextStyle(color: Colors.white)),
+            child: const Text(
+              "Hapus", 
+            style: TextStyle(
+              color: Colors.white
+              )
+              ),
           ),
         ],
       ),

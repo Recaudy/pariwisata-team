@@ -90,15 +90,12 @@ class _KomentarSheetState extends State<KomentarSheet> {
                   ),
                 );
               }
-
               final docs = snapshot.data!.docs;
-
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 itemCount: docs.length,
                 itemBuilder: (context, index) {
                   final data = docs[index].data() as Map<String, dynamic>;
-
                   return Container(
                     margin: const EdgeInsets.only(bottom: 16),
                     child: Row(

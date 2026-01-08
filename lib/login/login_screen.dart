@@ -97,7 +97,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Image.asset('assets/images/Logo_apk.png', height: 200),
+                    Image.asset('assets/images/Logo_apk.png',
+                     height: 200),
                     const SizedBox(height: 10),
                     Center(
                       child: Text.rich(
@@ -132,7 +133,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                     const SizedBox(height: 50),
-
                     Text(
                       'Email',
                       style: GoogleFonts.inter(
@@ -142,7 +142,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-
                     Container(
                       height: 60,
                       decoration: BoxDecoration(
@@ -180,7 +179,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-
                     Container(
                       height: 60,
                       decoration: BoxDecoration(
@@ -212,7 +210,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           hintText: 'Masukan Password Anda',
-                          hintStyle: const TextStyle(color: Colors.white60),
+                          hintStyle: const TextStyle(
+                            color: Colors.white60),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(
                             vertical: 18,
@@ -222,7 +221,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                     const SizedBox(height: 40),
-
                     SizedBox(
                       height: 55,
                       child: ElevatedButton(
@@ -251,7 +249,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                     const SizedBox(height: 30),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

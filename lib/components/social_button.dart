@@ -19,7 +19,8 @@ class SignInOneSocialButton extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(40.0),
-        border: Border.all(width: 1.0, color: const Color(0xFF134140)),
+        border: Border.all(width: 1.0,
+         color: const Color(0xFF134140)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

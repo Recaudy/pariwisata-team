@@ -64,7 +64,11 @@ class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
     }
 
     if (admin == null) {
-      return const Scaffold(body: Center(child: Text("Admin tidak ditemukan")));
+      return const Scaffold(
+        body: Center(
+          child: Text("Admin tidak ditemukan")
+          )
+          );
     }
 
     ImageProvider profileImage;
@@ -170,7 +174,6 @@ class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -212,9 +215,7 @@ class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 16),
-
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -258,7 +259,6 @@ class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
                   ),
 
                   const SizedBox(height: 16),
-
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -303,7 +303,6 @@ class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
                   ),
 
                   const SizedBox(height: 40),
-
                   SizedBox(
                     width: double.infinity,
                     height: 55,

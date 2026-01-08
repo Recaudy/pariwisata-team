@@ -153,7 +153,6 @@ class _ChatPageState extends State<ChatPage> {
               itemBuilder: (context, index) {
                 final msg = _message[index];
                 final isUser = msg["role"] == "user";
-
                 return Align(
                   alignment: isUser
                       ? Alignment.centerRight
@@ -233,7 +232,7 @@ class _ChatPageState extends State<ChatPage> {
                     child: TextField(
                       controller: _controller,
                       decoration: const InputDecoration(
-                        hintText: "Tanyakan pantai Babel...",
+                        hintText: "Tanyakan seputar wisata",
                         border: InputBorder.none,
                       ),
                       onSubmitted: sendMessage,

@@ -29,7 +29,9 @@ class KomentarPage extends StatelessWidget {
         centerTitle: true,
         title: Text(
           'ULASAN PENGUNJUNG',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold, 
+            fontSize: 18),
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -55,7 +57,7 @@ class KomentarPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Belum ada ulasan di database',
+                    'Belum ada ulasan',
                     style: GoogleFonts.inter(fontSize: 16, color: Colors.grey),
                   ),
                 ],
@@ -70,7 +72,6 @@ class KomentarPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final doc = komentarList[index];
               final data = doc.data() as Map<String, dynamic>;
-
               final user = data['user'] ?? 'Anonim';
               final komentar = data['komentar'] ?? '';
               final wisataId = data['wisataId'] ?? '';
@@ -80,7 +81,6 @@ class KomentarPage extends StatelessWidget {
                       'dd MMM yyyy, HH:mm',
                     ).format(createdAtTimestamp.toDate())
                   : '';
-
               final wisata = wisataList.firstWhere(
                 (w) => w.id == wisataId,
                 orElse: () => WisataModel(
@@ -267,7 +267,11 @@ class KomentarPage extends StatelessWidget {
                 );
               }
             },
-            child: const Text("Hapus", style: TextStyle(color: Colors.white)),
+            child: const Text("Hapus",
+             style: TextStyle(
+              color: Colors.white,
+              )
+              ),
           ),
         ],
       ),

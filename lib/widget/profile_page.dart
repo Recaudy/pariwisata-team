@@ -117,7 +117,9 @@ class _InformasiProfilState extends State<InformasiProfil> {
         widget.user.photoUrl!.isNotEmpty) {
       profileImg = NetworkImage(widget.user.photoUrl!);
     } else {
-      profileImg = const AssetImage("assets/images/profil.jpg");
+      profileImg = const AssetImage(
+        "assets/images/profil.jpg",
+        );
     }
 
     return Scaffold(
@@ -251,7 +253,6 @@ class _InformasiProfilState extends State<InformasiProfil> {
                     ),
 
                     const SizedBox(height: 20),
-
                     Text(
                       "Email",
                       style: GoogleFonts.poppins(
@@ -271,13 +272,14 @@ class _InformasiProfilState extends State<InformasiProfil> {
                         readOnly: true,
                         decoration: const InputDecoration(
                           border: InputBorder.none,
-                          icon: Icon(Icons.email_outlined, color: Colors.grey),
+                          icon: Icon(
+                          Icons.email_outlined, 
+                          color: Colors.grey),
                         ),
                       ),
                     ),
 
                     const SizedBox(height: 20),
-
                     Text(
                       "Password Baru",
                       style: GoogleFonts.poppins(
@@ -322,7 +324,6 @@ class _InformasiProfilState extends State<InformasiProfil> {
                     ),
 
                     const SizedBox(height: 40),
-
                     GestureDetector(
                       onTap: _isLoading ? null : _updateProfileData,
                       child: Container(

@@ -17,8 +17,8 @@ class _MapsPageState extends State<MapsPage> {
   bool isSearchOpen = false;
   String searchQuery = "";
 
-  final Color mainColor = Color(0xFF21899C);
-  final Color subColor = Color(0xFFE6F4F6);
+  final Color mainColor = const Color(0xFF21899C);
+  final Color subColor = const Color(0xFFE6F4F6);
 
   final List<Map<String, dynamic>> locations = const [
     {
@@ -125,8 +125,33 @@ class _MapsPageState extends State<MapsPage> {
                       onTap: () => setState(() => selectedPlace = place),
                       child: Column(
                         children: [
-                          _markerLabel(place['name']),
-                          Icon(Icons.location_pin, size: 50, color: mainColor),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 2,
+                              horizontal: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(6),
+                              boxShadow: const [
+                                BoxShadow(color: Colors.black26, blurRadius: 3),
+                              ],
+                            ),
+                            child: Text(
+                              place['name'].length > 18
+                                  ? "${place['name'].substring(0, 18)}..."
+                                  : place['name'],
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            Icons.location_pin,
+                            size: 50, 
+                          color: mainColor),
                         ],
                       ),
                     ),
@@ -151,7 +176,9 @@ class _MapsPageState extends State<MapsPage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade200),
+                      border: Border.all(
+                        color: Colors.grey.shade200
+                        ),
                       boxShadow: const [
                         BoxShadow(color: Colors.black26, blurRadius: 6),
                       ],
@@ -206,7 +233,37 @@ class _MapsPageState extends State<MapsPage> {
                       borderRadius: BorderRadius.circular(12),
                       child: resultHeight == 0
                           ? const SizedBox.shrink()
-                          : _buildSearchListWithContainer(filteredLocations),
+                          : Container(
+                              color: Colors.white,
+                              child: filteredLocations.isEmpty
+                                  ? const Center(
+                                      child: Text(
+                                        "Maaf, tempat tidak ditemukan",
+                                      ),
+                                    )
+                                  : ListView.builder(
+                                      padding: EdgeInsets.zero,
+                                      itemCount: filteredLocations.length,
+                                      itemBuilder: (_, i) {
+                                        final place = filteredLocations[i];
+                                        return ListTile(
+                                          title: Text(place["name"]),
+                                          subtitle: Text(place["address"]),
+                                          onTap: () {
+                                            _mapController.move(
+                                              place["latLng"],
+                                              15,
+                                            );
+                                            setState(() {
+                                              selectedPlace = place;
+                                              searchQuery = "";
+                                              isSearchOpen = false;
+                                            });
+                                          },
+                                        );
+                                      },
+                                    ),
+                            ),
                     ),
                   ),
                 ),
@@ -214,135 +271,78 @@ class _MapsPageState extends State<MapsPage> {
             ),
           ),
 
-          if (selectedPlace != null) _buildBottomSheet(),
-        ],
-      ),
-    );
-  }
-
-  Widget _markerLabel(String name) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 3)],
-      ),
-      child: Text(
-        name.length > 18 ? "${name.substring(0, 18)}..." : name,
-        textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget _buildSearchListWithContainer(List filtered) {
-    if (filtered.isEmpty) {
-      return Container(
-        color: Colors.white,
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Text(
-          "Maaf, tempat tidak ditemukan",
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[700],
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      color: Colors.white,
-      child: ListView.builder(
-        padding: EdgeInsets.zero,
-        itemCount: filtered.length,
-        itemBuilder: (_, i) {
-          final place = filtered[i];
-          return ListTile(
-            title: Text(place["name"]),
-            subtitle: Text(place["address"]),
-            onTap: () {
-              _mapController.move(place["latLng"], 15);
-              setState(() {
-                selectedPlace = place;
-                searchQuery = "";
-                isSearchOpen = false;
-              });
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildBottomSheet() {
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [subColor, mainColor],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 12,
-              color: Colors.black26,
-              offset: Offset(0, -4),
-            ),
-          ],
-        ),
-
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 45,
-              height: 5,
-              decoration: BoxDecoration(
-                color: mainColor,
-                borderRadius: BorderRadius.circular(40),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              selectedPlace!['name'],
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: mainColor,
-              ),
-            ),
-            Text(
-              selectedPlace!['address'],
-              style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: 130,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: mainColor,
-                  foregroundColor: Colors.white,
+          if (selectedPlace != null)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [subColor, mainColor],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(22),
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      blurRadius: 12,
+                      color: Colors.black26,
+                      offset: Offset(0, -4),
+                    ),
+                  ],
                 ),
-                icon: const Icon(Icons.directions),
-                label: const Text("Telusuri"),
-                onPressed: () {
-                  final pos = selectedPlace!['latLng'];
-                  openInGoogleMaps(pos.latitude, pos.longitude);
-                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 45,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: mainColor,
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      selectedPlace!['name'],
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: mainColor,
+                      ),
+                    ),
+                    Text(
+                      selectedPlace!['address'],
+                      style: TextStyle(
+                        fontSize: 15,
+                       color: Colors.grey[700]),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: 130,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: mainColor,
+                          foregroundColor: Colors.white,
+                        ),
+                        icon: const Icon(Icons.directions),
+                        label: const Text("Telusuri"),
+                        onPressed: () {
+                          final pos = selectedPlace!['latLng'];
+                          openInGoogleMaps(pos.latitude, pos.longitude);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
