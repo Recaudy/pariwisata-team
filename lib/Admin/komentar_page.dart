@@ -5,12 +5,11 @@ import '../services/komentar_service.dart';
 import '../models/wisata_model.dart';
 import 'package:intl/intl.dart';
 
-// Tema Warna Tetap Konsisten
 class AppColors {
-  static const Color primary   = Color(0xFF21899C); // Teal Tua
-  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
-  static const Color accent    = Color(0xFFF56B3F); // Oranye
-  static const Color highlight = Color(0xFFF9CA58); // Kuning
+  static const Color primary = Color(0xFF21899C);
+  static const Color secondary = Color(0xFF4DA1B0);
+  static const Color accent = Color(0xFFF56B3F);
+  static const Color highlight = Color(0xFFF9CA58);
 }
 
 class KomentarPage extends StatelessWidget {
@@ -34,8 +33,7 @@ class KomentarPage extends StatelessWidget {
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        // Mengambil data real-time dari koleksi 'komentar'
-        stream: service.getKomentar(), 
+        stream: service.getKomentar(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -50,7 +48,11 @@ class KomentarPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.chat_bubble_outline, size: 80, color: Colors.grey[400]),
+                  Icon(
+                    Icons.chat_bubble_outline,
+                    size: 80,
+                    color: Colors.grey[400],
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'Belum ada ulasan di database',
@@ -68,22 +70,30 @@ class KomentarPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final doc = komentarList[index];
               final data = doc.data() as Map<String, dynamic>;
-              
-              // Mengambil data dari Firestore sesuai screenshot Anda
+
               final user = data['user'] ?? 'Anonim';
               final komentar = data['komentar'] ?? '';
-              final wisataId = data['wisataId'] ?? ''; // ID penghubung ke koleksi wisata
+              final wisataId = data['wisataId'] ?? '';
               final Timestamp? createdAtTimestamp = data['createdAt'];
               final createdAt = createdAtTimestamp != null
-                  ? DateFormat('dd MMM yyyy, HH:mm').format(createdAtTimestamp.toDate())
+                  ? DateFormat(
+                      'dd MMM yyyy, HH:mm',
+                    ).format(createdAtTimestamp.toDate())
                   : '';
 
-              // LOGIKA PENGHUBUNG: Cari objek WisataModel berdasarkan wisataId dari database
               final wisata = wisataList.firstWhere(
                 (w) => w.id == wisataId,
                 orElse: () => WisataModel(
-                  id: '', nama: 'Tempat Wisata Tidak Ditemukan', lokasi: '', deskripsi: '',
-                  desc: '', gambar: '', image: '', kategori: '', subJudul: '', sejarah: '',
+                  id: '',
+                  nama: 'Tempat Wisata Tidak Ditemukan',
+                  lokasi: '',
+                  deskripsi: '',
+                  desc: '',
+                  gambar: '',
+                  image: '',
+                  kategori: '',
+                  subJudul: '',
+                  sejarah: '',
                 ),
               );
 
@@ -103,9 +113,11 @@ class KomentarPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Tampilan Nama Tempat Wisata (Header ulasan)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                       decoration: const BoxDecoration(
                         color: Color(0xFFF8F9FA),
                         borderRadius: BorderRadius.only(
@@ -115,7 +127,11 @@ class KomentarPage extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.place_rounded, color: AppColors.accent, size: 18),
+                          const Icon(
+                            Icons.place_rounded,
+                            color: AppColors.accent,
+                            size: 18,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -142,7 +158,11 @@ class KomentarPage extends StatelessWidget {
                               const CircleAvatar(
                                 radius: 18,
                                 backgroundColor: AppColors.secondary,
-                                child: Icon(Icons.person, color: Colors.white, size: 20),
+                                child: Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
@@ -159,15 +179,21 @@ class KomentarPage extends StatelessWidget {
                                     ),
                                     Text(
                                       createdAt,
-                                      style: GoogleFonts.inter(fontSize: 11, color: Colors.grey),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 11,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
-                              // Tombol Hapus (Admin)
                               IconButton(
-                                icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
-                                onPressed: () => _confirmDelete(context, service, doc.id),
+                                icon: const Icon(
+                                  Icons.delete_outline_rounded,
+                                  color: Colors.redAccent,
+                                ),
+                                onPressed: () =>
+                                    _confirmDelete(context, service, doc.id),
                               ),
                             ],
                           ),
@@ -175,7 +201,6 @@ class KomentarPage extends StatelessWidget {
                             padding: EdgeInsets.symmetric(vertical: 10),
                             child: Divider(height: 1, color: Color(0xFFEEEEEE)),
                           ),
-                          // Isi Komentar dari Database
                           Text(
                             '"$komentar"',
                             style: GoogleFonts.inter(
@@ -198,13 +223,19 @@ class KomentarPage extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, KomentarService service, String docId) {
+  void _confirmDelete(
+    BuildContext context,
+    KomentarService service,
+    String docId,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         title: const Text("Hapus Ulasan?"),
-        content: const Text("Data ulasan ini akan dihapus permanen dari database."),
+        content: const Text(
+          "Data ulasan ini akan dihapus permanen dari database.",
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -213,18 +244,26 @@ class KomentarPage extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () async {
               Navigator.pop(context);
               try {
                 await service.deleteKomentar(docId);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Ulasan berhasil dihapus"), backgroundColor: AppColors.primary),
+                  const SnackBar(
+                    content: Text("Ulasan berhasil dihapus"),
+                    backgroundColor: AppColors.primary,
+                  ),
                 );
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Gagal menghapus: $e"), backgroundColor: Colors.red),
+                  SnackBar(
+                    content: Text("Gagal menghapus: $e"),
+                    backgroundColor: Colors.red,
+                  ),
                 );
               }
             },

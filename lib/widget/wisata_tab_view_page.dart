@@ -3,12 +3,11 @@ import 'package:lottie/lottie.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'wisata_list_page.dart';
 
-// 4 WARNA UTAMA APLIKASI
 class AppColors {
-  static const Color primary = Color(0xFF21899C); // Teal Tua
-  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
-  static const Color accent = Color(0xFFF56B3F); // Oranye
-  static const Color highlight = Color(0xFFF9CA58); // Kuning Cerah
+  static const Color primary = Color(0xFF21899C);
+  static const Color secondary = Color(0xFF4DA1B0);
+  static const Color accent = Color(0xFFF56B3F);
+  static const Color highlight = Color(0xFFF9CA58);
 }
 
 class WisataTabViewPage extends StatelessWidget {
@@ -41,7 +40,6 @@ class WisataTabViewPage extends StatelessWidget {
                 SafeArea(
                   child: Column(
                     children: [
-                      // Bar Atas: Tombol Back & Judul
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
@@ -50,7 +48,7 @@ class WisataTabViewPage extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                          SizedBox(height: 15),
+                            SizedBox(height: 15),
                             Center(
                               child: Text(
                                 "DESTINASI WISATA",
@@ -61,11 +59,11 @@ class WisataTabViewPage extends StatelessWidget {
                                   letterSpacing: 1.1,
                                 ),
                               ),
-                            ),// Penyeimbang
+                            ),
                           ],
                         ),
                       ),
-                        SizedBox(height: 15),
+                      SizedBox(height: 15),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -95,7 +93,6 @@ class WisataTabViewPage extends StatelessWidget {
               ],
             ),
 
-            // 2. TAB BAR (PENGATURAN WARNA KONSISTEN)
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               decoration: BoxDecoration(
@@ -110,8 +107,7 @@ class WisataTabViewPage extends StatelessWidget {
                 ],
               ),
               child: TabBar(
-                indicatorColor:
-                    AppColors.accent, // Aksen Oranye untuk indikator
+                indicatorColor: AppColors.accent,
                 indicatorWeight: 4,
                 indicatorSize: TabBarIndicatorSize.label,
                 labelColor: AppColors.primary,
@@ -132,7 +128,6 @@ class WisataTabViewPage extends StatelessWidget {
               ),
             ),
 
-            // 3. TAB VIEW CONTENT
             const Expanded(
               child: TabBarView(
                 children: [

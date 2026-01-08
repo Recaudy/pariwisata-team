@@ -6,12 +6,11 @@ import 'signup_screen.dart';
 import '../services/auth_service.dart';
 import 'package:project_uts_pariwisata/main.dart';
 
-// 1. Definisikan Tema Warna secara Global/Static
 class AppColors {
-  static const Color primary = Color(0xFF21899C); // Teal Tua
-  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
-  static const Color accent = Color(0xFFF56B3F); // Oranye
-  static const Color highlight = Color(0xFFF9CA58); // Kuning Cerah
+  static const Color primary = Color(0xFF21899C);
+  static const Color secondary = Color(0xFF4DA1B0);
+  static const Color accent = Color(0xFFF56B3F);
+  static const Color highlight = Color(0xFFF9CA58);
 }
 
 class LoginScreen extends StatefulWidget {
@@ -22,7 +21,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // --- LOGIKA & FUNGSI (TIDAK BERUBAH) ---
   final AuthService _authService = AuthService();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -72,14 +70,12 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // --- TAMPILAN UI ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: Stack(
         children: [
-          // Dekorasi background
           Positioned(
             top: -100,
             left: -50,
@@ -128,8 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text(
                         'Jelajahi Pesona Wisata Bangka Belitung',
                         style: GoogleFonts.inter(
-                          color:
-                              Colors.white, // Diubah ke Putih Solid agar jelas
+                          color: Colors.white,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -138,26 +133,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 50),
 
-                    // Label Email
                     Text(
                       'Email',
                       style: GoogleFonts.inter(
                         color: Colors.white,
-                        fontWeight: FontWeight.bold, // Dipertebal
+                        fontWeight: FontWeight.bold,
                         fontSize: 15,
                       ),
                     ),
                     const SizedBox(height: 8),
 
-                    // Input Email
                     Container(
                       height: 60,
                       decoration: BoxDecoration(
                         color: AppColors.secondary,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white24,
-                        ), // Border halus
+                        border: Border.all(color: Colors.white24),
                       ),
                       child: TextField(
                         controller: _emailController,
@@ -171,9 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: Colors.white,
                           ),
                           hintText: 'Masukan Email Anda',
-                          hintStyle: TextStyle(
-                            color: Colors.white60,
-                          ), // Hint lebih terang
+                          hintStyle: TextStyle(color: Colors.white60),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(vertical: 18),
                         ),
@@ -182,18 +171,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 20),
 
-                    // Label Password
                     Text(
                       'Password',
                       style: GoogleFonts.inter(
                         color: Colors.white,
-                        fontWeight: FontWeight.bold, // Dipertebal
+                        fontWeight: FontWeight.bold,
                         fontSize: 15,
                       ),
                     ),
                     const SizedBox(height: 8),
 
-                    // Input Password
                     Container(
                       height: 60,
                       decoration: BoxDecoration(
@@ -236,7 +223,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 40),
 
-                    // Tombol Login
                     SizedBox(
                       height: 55,
                       child: ElevatedButton(
@@ -256,7 +242,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             : Text(
                                 'LOGIN',
                                 style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w800, // Sangat tebal
+                                  fontWeight: FontWeight.w800,
                                   fontSize: 16,
                                   letterSpacing: 1.2,
                                 ),
@@ -266,7 +252,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 30),
 
-                    // Footer / Link Sign Up
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -290,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             "Sign Up",
                             style: GoogleFonts.inter(
                               color: AppColors.highlight,
-                              fontWeight: FontWeight.w900, // Extra bold
+                              fontWeight: FontWeight.w900,
                               fontSize: 16,
                             ),
                           ),

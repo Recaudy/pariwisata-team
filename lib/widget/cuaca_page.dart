@@ -5,12 +5,11 @@ import '../services/api_service.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// 4 WARNA UTAMA APLIKASI
 class AppColors {
-  static const Color primary = Color(0xFF21899C); // Teal Tua
-  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
-  static const Color accent = Color(0xFFF56B3F); // Oranye
-  static const Color highlight = Color(0xFFF9CA58); // Kuning Cerah
+  static const Color primary = Color(0xFF21899C);
+  static const Color secondary = Color(0xFF4DA1B0);
+  static const Color accent = Color(0xFFF56B3F);
+  static const Color highlight = Color(0xFFF9CA58);
 }
 
 class WeatherPage extends StatefulWidget {
@@ -40,7 +39,6 @@ class _WeatherPageState extends State<WeatherPage> {
     _weatherFuture = _apiService.fetchAllCuaca();
   }
 
-  // LOGIKA PENGGANTI GAMBAR: MENGGUNAKAN IKON BERDASARKAN TEKS CUACA
   Widget _getWeatherIcon(
     String weatherDesc, {
     double size = 50,
@@ -137,7 +135,6 @@ class _WeatherPageState extends State<WeatherPage> {
 
           return Column(
             children: [
-              // HEADER AREA (TEAL GRADIENT)
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
@@ -154,7 +151,6 @@ class _WeatherPageState extends State<WeatherPage> {
                 ),
                 child: Column(
                   children: [
-                    // FILTER CHIPS
                     SizedBox(
                       height: 40,
                       child: ListView.builder(
@@ -207,7 +203,6 @@ class _WeatherPageState extends State<WeatherPage> {
                     ),
                     const SizedBox(height: 15),
 
-                    // MENGGUNAKAN IKON MANUAL (BUKAN IMAGE)
                     _getWeatherIcon(current.weatherDesc, size: 100),
 
                     const SizedBox(height: 10),
@@ -231,7 +226,6 @@ class _WeatherPageState extends State<WeatherPage> {
                 ),
               ),
 
-              // DAFTAR WILAYAH/WAKTU
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(20),
@@ -263,7 +257,6 @@ class _WeatherPageState extends State<WeatherPage> {
                       ),
                       child: Row(
                         children: [
-                          // IKON CUACA MANUAL
                           _getWeatherIcon(
                             item.weatherDesc,
                             size: 35,
@@ -304,7 +297,6 @@ class _WeatherPageState extends State<WeatherPage> {
                           ),
                         ],
                       ),
-
                     );
                   },
                 ),
@@ -314,7 +306,7 @@ class _WeatherPageState extends State<WeatherPage> {
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Color(0xFF21899C),
-                  borderRadius: BorderRadius.circular(10)
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Center(
                   child: Text(
@@ -324,9 +316,9 @@ class _WeatherPageState extends State<WeatherPage> {
                       fontSize: 13,
                       color: Colors.white,
                     ),
-                    )
-                    ),
-              )
+                  ),
+                ),
+              ),
             ],
           );
         },

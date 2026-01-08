@@ -1,9 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-
 import 'package:google_fonts/google_fonts.dart';
-
 import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -33,13 +30,10 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-         
         ),
       ),
     );
   }
-
-
 
   Widget richText(double fontSize) {
     return Text.rich(

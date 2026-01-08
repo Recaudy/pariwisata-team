@@ -4,12 +4,11 @@ import '../models/wisata_model.dart';
 import '../services/wisata_services.dart';
 import 'wisata_form_page.dart';
 
-// Tema Warna Konsisten
 class AppColors {
-  static const Color primary   = Color(0xFF21899C); // Teal Tua
-  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
-  static const Color accent    = Color(0xFFF56B3F); // Oranye
-  static const Color highlight = Color(0xFFF9CA58); // Kuning
+  static const Color primary = Color(0xFF21899C);
+  static const Color secondary = Color(0xFF4DA1B0);
+  static const Color accent = Color(0xFFF56B3F);
+  static const Color highlight = Color(0xFFF9CA58);
 }
 
 class WisataListPage extends StatefulWidget {
@@ -38,8 +37,7 @@ class _WisataListPageState extends State<WisataListPage> {
     'religi': 'Wisata Religi',
   };
 
-  // Batasan item jika diakses dari ringkasan (opsional)
-  final int maxItems = 10; 
+  final int maxItems = 10;
 
   @override
   void initState() {
@@ -64,20 +62,22 @@ class _WisataListPageState extends State<WisataListPage> {
         stream: _service.getWisata(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
           }
 
           final wisataList = snapshot.data ?? [];
 
-          // Logika Filter Kategori
           final filteredWisata = selectedKategori == 'all'
               ? wisataList
-              : wisataList.where((w) => w.kategori == selectedKategori).toList();
+              : wisataList
+                    .where((w) => w.kategori == selectedKategori)
+                    .toList();
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. HEADER & DROPDOWN FILTER
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: const BoxDecoration(
@@ -92,7 +92,10 @@ class _WisataListPageState extends State<WisataListPage> {
                   children: [
                     Text(
                       "Filter Kategori",
-                      style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Container(
@@ -106,12 +109,20 @@ class _WisataListPageState extends State<WisataListPage> {
                         child: DropdownButtonFormField<String>(
                           value: selectedKategori,
                           dropdownColor: AppColors.primary,
-                          style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600),
-                          decoration: const InputDecoration(border: InputBorder.none),
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                          ),
                           items: kategoriMap.entries.map((e) {
                             return DropdownMenuItem(
                               value: e.key,
-                              child: Text(e.value, style: const TextStyle(color: Colors.white)),
+                              child: Text(
+                                e.value,
+                                style: const TextStyle(color: Colors.white),
+                              ),
                             );
                           }).toList(),
                           onChanged: (value) {
@@ -128,16 +139,22 @@ class _WisataListPageState extends State<WisataListPage> {
 
               const SizedBox(height: 20),
 
-              // 2. LIST DATA (WIDGET DASAR LINIER)
               Expanded(
                 child: filteredWisata.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.map_rounded, size: 80, color: Colors.grey[300]),
+                            Icon(
+                              Icons.map_rounded,
+                              size: 80,
+                              color: Colors.grey[300],
+                            ),
                             const SizedBox(height: 10),
-                            const Text("Belum ada data wisata", style: TextStyle(color: Colors.grey)),
+                            const Text(
+                              "Belum ada data wisata",
+                              style: TextStyle(color: Colors.grey),
+                            ),
                           ],
                         ),
                       )
@@ -169,7 +186,10 @@ class _WisataListPageState extends State<WisataListPage> {
                                   color: AppColors.secondary.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: const Icon(Icons.landscape_rounded, color: AppColors.primary),
+                                child: const Icon(
+                                  Icons.landscape_rounded,
+                                  color: AppColors.primary,
+                                ),
                               ),
                               title: Text(
                                 w.nama,
@@ -181,7 +201,11 @@ class _WisataListPageState extends State<WisataListPage> {
                               ),
                               subtitle: Row(
                                 children: [
-                                  const Icon(Icons.location_on, size: 14, color: AppColors.accent),
+                                  const Icon(
+                                    Icons.location_on,
+                                    size: 14,
+                                    color: AppColors.accent,
+                                  ),
                                   const SizedBox(width: 4),
                                   Expanded(
                                     child: Text(
@@ -195,21 +219,26 @@ class _WisataListPageState extends State<WisataListPage> {
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  // EDIT BUTTON
                                   IconButton(
-                                    icon: const Icon(Icons.edit_document, color: Colors.blue),
+                                    icon: const Icon(
+                                      Icons.edit_document,
+                                      color: Colors.blue,
+                                    ),
                                     onPressed: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => WisataFormPage(wisata: w),
+                                          builder: (_) =>
+                                              WisataFormPage(wisata: w),
                                         ),
                                       );
                                     },
                                   ),
-                                  // DELETE BUTTON
                                   IconButton(
-                                    icon: const Icon(Icons.delete_forever_rounded, color: Colors.redAccent),
+                                    icon: const Icon(
+                                      Icons.delete_forever_rounded,
+                                      color: Colors.redAccent,
+                                    ),
                                     onPressed: () => _confirmDelete(context, w),
                                   ),
                                 ],
@@ -226,7 +255,6 @@ class _WisataListPageState extends State<WisataListPage> {
     );
   }
 
-  // Fungsi Konfirmasi Hapus Dasar
   void _confirmDelete(BuildContext context, WisataModel w) {
     showDialog(
       context: context,
@@ -242,7 +270,9 @@ class _WisataListPageState extends State<WisataListPage> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () async {
               Navigator.pop(context);

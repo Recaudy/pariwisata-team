@@ -8,7 +8,7 @@ class MapsPage extends StatefulWidget {
 
   @override
   State<MapsPage> createState() => _MapsPageState();
-} 
+}
 
 class _MapsPageState extends State<MapsPage> {
   final MapController _mapController = MapController();
@@ -17,10 +17,9 @@ class _MapsPageState extends State<MapsPage> {
   bool isSearchOpen = false;
   String searchQuery = "";
 
-  final Color mainColor =  Color(0xFF21899C);
+  final Color mainColor = Color(0xFF21899C);
   final Color subColor = Color(0xFFE6F4F6);
 
-  // DATA LOKASI (tidak diubah)
   final List<Map<String, dynamic>> locations = const [
     {
       "name": "Pantai Pasir Padi",
@@ -79,7 +78,6 @@ class _MapsPageState extends State<MapsPage> {
     },
   ];
 
-  // BUKA GOOGLE MAPS (tidak diubah)
   Future<void> openInGoogleMaps(double lat, double lng) async {
     final url = Uri.parse(
       "https://www.google.com/maps/dir/?api=1&destination=$lat,$lng",
@@ -100,19 +98,16 @@ class _MapsPageState extends State<MapsPage> {
         )
         .toList();
 
-    // Hitung height hasil pencarian (tidak diubah)
     final int resultHeight = (isSearchOpen && searchQuery.isNotEmpty)
         ? (filteredLocations.isEmpty ? 80 : 240)
         : 0;
 
-    // Hitung width layar untuk search bar (agar selalu finite)
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double searchBarWidth = isSearchOpen ? screenWidth - 30 : 60; // 30 untuk left+right padding
+    final double searchBarWidth = isSearchOpen ? screenWidth - 30 : 60;
 
     return Scaffold(
       body: Stack(
         children: [
-          // MAP (tidak diubah)
           FlutterMap(
             mapController: _mapController,
             options: const MapOptions(initialCenter: center, initialZoom: 12),
@@ -141,33 +136,32 @@ class _MapsPageState extends State<MapsPage> {
             ],
           ),
 
-          // SEARCH BAR + LIST (Positioned) - DENGAN PERUBAHAN
           Positioned(
             top: 20,
             left: 15,
             right: 15,
             child: Column(
               children: [
-                // Search bar: Ganti AnimatedContainer dengan AnimatedSize untuk menghindari interpolasi unbounded
                 AnimatedSize(
                   duration: const Duration(milliseconds: 220),
                   curve: Curves.easeInOut,
                   child: Container(
                     height: 50,
-                    width: searchBarWidth, // Selalu finite
+                    width: searchBarWidth,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.grey.shade200),
-                      boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 6)],
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black26, blurRadius: 6),
+                      ],
                     ),
                     child: Row(
                       children: [
-                        // Icon dengan AnimatedSwitcher untuk transisi smooth antara search dan close
                         AnimatedSwitcher(
                           duration: const Duration(milliseconds: 220),
                           child: GestureDetector(
-                            key: ValueKey<bool>(isSearchOpen), // Key untuk animasi
+                            key: ValueKey<bool>(isSearchOpen),
                             onTap: () {
                               setState(() {
                                 if (isSearchOpen) searchQuery = "";
@@ -183,7 +177,6 @@ class _MapsPageState extends State<MapsPage> {
                             ),
                           ),
                         ),
-                        // TextField muncul saat open
                         if (isSearchOpen)
                           Expanded(
                             child: TextField(
@@ -193,7 +186,8 @@ class _MapsPageState extends State<MapsPage> {
                                 border: InputBorder.none,
                               ),
                               cursorColor: mainColor,
-                              onChanged: (value) => setState(() => searchQuery = value),
+                              onChanged: (value) =>
+                                  setState(() => searchQuery = value),
                             ),
                           ),
                       ],
@@ -201,13 +195,12 @@ class _MapsPageState extends State<MapsPage> {
                   ),
                 ),
 
-                // Hasil pencarian: Ganti AnimatedContainer dengan AnimatedSize, tambahkan width: double.infinity
                 AnimatedSize(
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeInOut,
                   child: Container(
                     height: resultHeight.toDouble(),
-                    width: double.infinity, // Pastikan width bounded
+                    width: double.infinity,
                     margin: const EdgeInsets.only(top: 8),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
@@ -221,14 +214,12 @@ class _MapsPageState extends State<MapsPage> {
             ),
           ),
 
-          // BOTTOM SHEET (tidak diubah)
           if (selectedPlace != null) _buildBottomSheet(),
         ],
       ),
     );
   }
 
-  // _markerLabel (tidak diubah)
   Widget _markerLabel(String name) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
@@ -245,7 +236,6 @@ class _MapsPageState extends State<MapsPage> {
     );
   }
 
-  // _buildSearchListWithContainer (tidak diubah, tapi pastikan ListView bounded)
   Widget _buildSearchListWithContainer(List filtered) {
     if (filtered.isEmpty) {
       return Container(
@@ -287,7 +277,6 @@ class _MapsPageState extends State<MapsPage> {
     );
   }
 
-  // _buildBottomSheet (tidak diubah)
   Widget _buildBottomSheet() {
     return Positioned(
       left: 0,
@@ -296,21 +285,21 @@ class _MapsPageState extends State<MapsPage> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         padding: const EdgeInsets.all(16),
-       decoration: BoxDecoration(
-  gradient: LinearGradient(
-    colors: [subColor, mainColor],
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-  ),
-  borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-  boxShadow: [
-    BoxShadow(
-      blurRadius: 12,
-      color: Colors.black26,
-      offset: Offset(0, -4),
-    ),
-  ],
-),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [subColor, mainColor],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 12,
+              color: Colors.black26,
+              offset: Offset(0, -4),
+            ),
+          ],
+        ),
 
         child: Column(
           mainAxisSize: MainAxisSize.min,

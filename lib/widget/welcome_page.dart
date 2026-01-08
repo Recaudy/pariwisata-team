@@ -3,12 +3,11 @@ import 'package:lottie/lottie.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'maps_page.dart';
 
-// 4 WARNA UTAMA APLIKASI
 class AppColors {
-  static const Color primary = Color(0xFF21899C); // Teal Tua
-  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
-  static const Color accent = Color(0xFFF56B3F); // Oranye
-  static const Color highlight = Color(0xFFF9CA58); // Kuning Cerah
+  static const Color primary = Color(0xFF21899C);
+  static const Color secondary = Color(0xFF4DA1B0);
+  static const Color accent = Color(0xFFF56B3F);
+  static const Color highlight = Color(0xFFF9CA58);
 }
 
 class WelcomePage extends StatelessWidget {
@@ -20,7 +19,6 @@ class WelcomePage extends StatelessWidget {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        // GRADIENT MENGGUNAKAN TEAL TUA DAN TEAL MUDA
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.primary, Color(0xFFE6F4F6)],
@@ -31,17 +29,15 @@ class WelcomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 1. ANIMASI LOTTIE
             Lottie.asset(
-              "assets/lottie/Gps.json", 
-              height: 280, 
+              "assets/lottie/Gps.json",
+              height: 280,
               width: 280,
               fit: BoxFit.contain,
             ),
-            
+
             const SizedBox(height: 10),
 
-            // 2. JUDUL UTAMA
             Text(
               "Jelajahi",
               style: GoogleFonts.poppins(
@@ -61,7 +57,6 @@ class WelcomePage extends StatelessWidget {
 
             const SizedBox(height: 15),
 
-            // 3. DESKRIPSI (TEKS DASAR)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: Text(
@@ -78,7 +73,6 @@ class WelcomePage extends StatelessWidget {
 
             const SizedBox(height: 60),
 
-            // 4. TOMBOL JELAJAH MANUAL (GESTURE DETECTOR + CONTAINER)
             GestureDetector(
               onTap: () {
                 Navigator.pushReplacement(
@@ -90,7 +84,7 @@ class WelcomePage extends StatelessWidget {
                 width: 220,
                 height: 55,
                 decoration: BoxDecoration(
-                  color: Colors.white, // Latar putih agar kontras dengan gradient
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
@@ -123,10 +117,9 @@ class WelcomePage extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 20),
-            
-            // AKSEN KECIL DI BAWAH (OPSIONAL UNTUK MEMPERCANTIK)
+
             Container(
               width: 50,
               height: 5,

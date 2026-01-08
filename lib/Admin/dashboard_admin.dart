@@ -8,14 +8,13 @@ import '../services/komentar_service.dart';
 import 'wisata_form_page.dart';
 import 'Komentar_page.dart';
 import 'wisata_list_page.dart';
-import 'ratinglist_page.dart'; 
+import 'ratinglist_page.dart';
 
-// TEMA WARNA (Tetap Konsisten)
 class AppColors {
-  static const Color primary = Color(0xFF21899C); // Teal Tua
-  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
-  static const Color accent = Color(0xFFF56B3F); // Oranye
-  static const Color highlight = Color(0xFFF9CA58); // Kuning
+  static const Color primary = Color(0xFF21899C);
+  static const Color secondary = Color(0xFF4DA1B0);
+  static const Color accent = Color(0xFFF56B3F);
+  static const Color highlight = Color(0xFFF9CA58);
 }
 
 class AdminDashboardPage extends StatefulWidget {
@@ -45,7 +44,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               Navigator.pop(context);
               Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
             },
-            child: const Text("Logout", style: TextStyle(color: Color(0xFF21899C))),
+            child: const Text(
+              "Logout",
+              style: TextStyle(color: Color(0xFF21899C)),
+            ),
           ),
         ],
       ),
@@ -56,18 +58,13 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF2F5F7),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: AppColors.primary,
-      ),
+      appBar: AppBar(elevation: 0, backgroundColor: AppColors.primary),
 
-      /* ===== DRAWER (WIDGET DASAR DISESUAIKAN) ===== */
       drawer: Drawer(
         child: Container(
-          color: Colors.white, // Latar belakang drawer putih agar bersih
+          color: Colors.white,
           child: Column(
             children: [
-              // HEADER DRAWER DISESUAIKAN
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(
@@ -116,7 +113,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               ),
               const SizedBox(height: 10),
 
-              // ITEM MENU DRAWER
               ListTile(
                 leading: const Icon(
                   Icons.dashboard_rounded,
@@ -126,7 +122,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   "Kelola Wisata",
                   style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                 ),
-                  onTap: () {
+                onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
                     context,
@@ -153,16 +149,13 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const InformasiProfilAdmin(
-
-                      ),
+                      builder: (_) => const InformasiProfilAdmin(),
                     ),
                   );
                 },
               ),
               const Divider(indent: 20, endIndent: 20),
 
-              // TOMBOL LOGOUT DI BAWAH
               const Spacer(),
               Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -223,7 +216,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 ),
                 const SizedBox(height: 15),
 
-                // BOX STATISTIK DENGAN 3 AREA KLIK TERPISAH
                 StreamBuilder<QuerySnapshot>(
                   stream: _komentarService.getKomentar(),
                   builder: (context, komentarSnap) {
@@ -270,7 +262,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              // AREA 1: KLIK KE WISATA LIST
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
@@ -286,42 +277,70 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                                   },
                                   child: Column(
                                     children: [
-                                      const Icon(Icons.landscape_rounded, color: AppColors.highlight, size: 30),
+                                      const Icon(
+                                        Icons.landscape_rounded,
+                                        color: AppColors.highlight,
+                                        size: 30,
+                                      ),
                                       const SizedBox(height: 5),
                                       Text(
                                         wisataList.length.toString(),
-                                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                      const Text("Wisata", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                      const Text(
+                                        "Wisata",
+                                        style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 12,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
-                              // AREA 2: KLIK KE KOMENTAR PAGE
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) => KomentarPage(wisataList: wisataList),
+                                        builder: (_) => KomentarPage(
+                                          wisataList: wisataList,
+                                        ),
                                       ),
                                     );
                                   },
                                   child: Column(
                                     children: [
-                                      const Icon(Icons.rate_review_rounded, color: AppColors.highlight, size: 30),
+                                      const Icon(
+                                        Icons.rate_review_rounded,
+                                        color: AppColors.highlight,
+                                        size: 30,
+                                      ),
                                       const SizedBox(height: 5),
                                       Text(
                                         totalUlasan.toString(),
-                                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                      const Text("Ulasan", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                      const Text(
+                                        "Ulasan",
+                                        style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 12,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
-                              // AREA 3: KLIK KE RATING LIST PAGE
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
@@ -330,20 +349,35 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                                       MaterialPageRoute(
                                         builder: (_) => RatingListPage(
                                           wisataList: wisataList,
-                                          ratingPerWisata: const <String, List<int>>{},
+                                          ratingPerWisata:
+                                              const <String, List<int>>{},
                                         ),
                                       ),
                                     );
                                   },
                                   child: Column(
                                     children: [
-                                      const Icon(Icons.star_rounded, color: AppColors.highlight, size: 30),
+                                      const Icon(
+                                        Icons.star_rounded,
+                                        color: AppColors.highlight,
+                                        size: 30,
+                                      ),
                                       const SizedBox(height: 5),
                                       Text(
                                         avgRating.toStringAsFixed(1),
-                                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                      const Text("Rating", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                      const Text(
+                                        "Rating",
+                                        style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 12,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -367,7 +401,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 ),
                 const SizedBox(height: 15),
 
-                // MENU CEPAT (WIDGET DASAR)
                 Row(
                   children: [
                     Expanded(

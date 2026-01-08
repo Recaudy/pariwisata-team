@@ -3,25 +3,22 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/wisata_model.dart';
 
-// ================= WARNA KONSISTEN =================
 class AppColors {
-  static const Color primary   = Color(0xFF21899C); // Teal Tua
-  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
-  static const Color accent    = Color(0xFFF56B3F); // Oranye
-  static const Color highlight = Color(0xFFF9CA58); // Kuning
+  static const Color primary = Color(0xFF21899C);
+  static const Color secondary = Color(0xFF4DA1B0);
+  static const Color accent = Color(0xFFF56B3F);
+  static const Color highlight = Color(0xFFF9CA58);
 }
 
 class RatingListPage extends StatelessWidget {
   final List<WisataModel> wisataList;
 
-  // 👉 PARAMETER INI DITAMBAHKAN AGAR TIDAK ERROR
-  // 👉 Tidak dipakai karena data diambil via StreamBuilder
   final Map<String, List<int>>? ratingPerWisata;
 
   const RatingListPage({
     super.key,
     required this.wisataList,
-    this.ratingPerWisata, // ← solusi utama
+    this.ratingPerWisata,
   });
 
   @override
@@ -59,7 +56,6 @@ class RatingListPage extends StatelessWidget {
           ),
         ),
 
-        // ================= STREAM FIREBASE =================
         body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance.collection('ratings').snapshots(),
           builder: (context, snapshot) {
@@ -78,13 +74,12 @@ class RatingListPage extends StatelessWidget {
               );
             }
 
-            // ========== PENGELOMPOKAN RATING ==========
             Map<String, List<int>> ratingMap = {};
 
             for (var doc in snapshot.data!.docs) {
               final data = doc.data() as Map<String, dynamic>;
               final wisataId = data['wisataId'] ?? '';
-              final rating   = data['rating'] ?? 0;
+              final rating = data['rating'] ?? 0;
 
               if (wisataId.isNotEmpty) {
                 ratingMap.putIfAbsent(wisataId, () => []);
@@ -113,8 +108,7 @@ class RatingListPage extends StatelessWidget {
                 ),
               );
 
-              final average =
-                  ratings.reduce((a, b) => a + b) / ratings.length;
+              final average = ratings.reduce((a, b) => a + b) / ratings.length;
 
               final card = _buildRatingCard(wisata.nama, average);
 
@@ -140,7 +134,6 @@ class RatingListPage extends StatelessWidget {
     );
   }
 
-  // ================= CARD RATING =================
   Widget _buildRatingCard(String nama, double average) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -156,21 +149,23 @@ class RatingListPage extends StatelessWidget {
         ],
       ),
       child: ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 10,
+        ),
         leading: CircleAvatar(
           backgroundColor: AppColors.secondary.withOpacity(0.15),
           child: Icon(
             average >= 4
                 ? Icons.sentiment_very_satisfied
                 : average >= 3
-                    ? Icons.sentiment_neutral
-                    : Icons.sentiment_very_dissatisfied,
+                ? Icons.sentiment_neutral
+                : Icons.sentiment_very_dissatisfied,
             color: average >= 4
                 ? Colors.green
                 : average >= 3
-                    ? AppColors.highlight
-                    : AppColors.accent,
+                ? AppColors.highlight
+                : AppColors.accent,
           ),
         ),
         title: Text(
@@ -183,8 +178,11 @@ class RatingListPage extends StatelessWidget {
         ),
         subtitle: Row(
           children: [
-            const Icon(Icons.star_rounded,
-                color: AppColors.highlight, size: 20),
+            const Icon(
+              Icons.star_rounded,
+              color: AppColors.highlight,
+              size: 20,
+            ),
             const SizedBox(width: 4),
             Text(
               "Rata-rata: ${average.toStringAsFixed(1)}",
@@ -199,15 +197,13 @@ class RatingListPage extends StatelessWidget {
     );
   }
 
-  // ================= TAB CONTENT =================
   Widget _buildTabContent(List<Widget> items, String emptyMessage) {
     if (items.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.star_border_rounded,
-                size: 80, color: Colors.grey[300]),
+            Icon(Icons.star_border_rounded, size: 80, color: Colors.grey[300]),
             const SizedBox(height: 10),
             Text(
               emptyMessage,

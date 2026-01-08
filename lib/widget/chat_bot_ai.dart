@@ -4,12 +4,11 @@ import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// 4 WARNA UTAMA APLIKASI
 class AppColors {
-  static const Color primary = Color(0xFF21899C); // Teal Tua
-  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
-  static const Color accent = Color(0xFFF56B3F); // Oranye
-  static const Color highlight = Color(0xFFF9CA58); // Kuning Cerah
+  static const Color primary = Color(0xFF21899C);
+  static const Color secondary = Color(0xFF4DA1B0);
+  static const Color accent = Color(0xFFF56B3F);
+  static const Color highlight = Color(0xFFF9CA58);
 }
 
 class ChatPage extends StatefulWidget {
@@ -82,7 +81,6 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF2F5F7),
-      // 1. APP BAR (TEAL TUA & KUNING)
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         elevation: 0,
@@ -105,18 +103,13 @@ class _ChatPageState extends State<ChatPage> {
         ),
         actions: [
           IconButton(
-            // Menggunakan warna ACCENT (ORANYE) untuk hapus chat agar terlihat penting
-            icon: const Icon(
-              Icons.delete,
-              color: AppColors.highlight,
-            ),
+            icon: const Icon(Icons.delete, color: AppColors.highlight),
             onPressed: _clearChat,
           ),
         ],
       ),
       body: Column(
         children: [
-          // 2. HEADER INFO (TEAL MUDA & KUNING)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(15),
@@ -147,14 +140,12 @@ class _ChatPageState extends State<ChatPage> {
                         color: AppColors.primary,
                       ),
                     ),
-                   
                   ],
                 ),
               ],
             ),
           ),
 
-          // 3. CHAT AREA (MANUAL LIST)
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(20),
@@ -174,7 +165,6 @@ class _ChatPageState extends State<ChatPage> {
                       maxWidth: MediaQuery.of(context).size.width * 0.75,
                     ),
                     decoration: BoxDecoration(
-                      // USER: TEAL TUA, AI: TEAL MUDA
                       color: isUser ? AppColors.primary : Colors.white,
                       borderRadius: BorderRadius.only(
                         topLeft: const Radius.circular(15),
@@ -207,7 +197,6 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
 
-          // 4. LOADING INDICATOR (ORANYE)
           if (_isloading)
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
@@ -217,7 +206,6 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ),
 
-          // 5. INPUT BAR (TEAL MUDA & ORANYE)
           Container(
             padding: const EdgeInsets.fromLTRB(15, 10, 15, 25),
             decoration: BoxDecoration(
@@ -236,9 +224,7 @@ class _ChatPageState extends State<ChatPage> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     decoration: BoxDecoration(
-                      color: AppColors.secondary.withOpacity(
-                        0.05,
-                      ), // Aksen TEAL MUDA
+                      color: AppColors.secondary.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(25),
                       border: Border.all(
                         color: AppColors.secondary.withOpacity(0.2),
@@ -261,8 +247,7 @@ class _ChatPageState extends State<ChatPage> {
                     height: 50,
                     width: 50,
                     decoration: const BoxDecoration(
-                      color:
-                          AppColors.accent, // Aksen ORANYE untuk tombol kirim
+                      color: AppColors.accent,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(

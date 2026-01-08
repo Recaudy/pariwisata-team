@@ -80,7 +80,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Nama Lokasi
                   TextFormField(
                     controller: _namaController,
                     decoration: InputDecoration(
@@ -98,7 +97,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Lokasi
                   TextFormField(
                     controller: _lokasiController,
                     decoration: InputDecoration(
@@ -116,7 +114,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Deskripsi
                   TextFormField(
                     controller: _deskripsiController,
                     maxLines: 4,
@@ -136,7 +133,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Harga
                   TextFormField(
                     controller: _hargaController,
                     keyboardType: TextInputType.number,
@@ -155,7 +151,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Jumlah
                   TextFormField(
                     controller: _jumlahController,
                     keyboardType: TextInputType.number,
@@ -174,7 +169,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Tombol Submit
                   Center(
                     child: ElevatedButton(
                       onPressed: () {

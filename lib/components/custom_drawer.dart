@@ -1,19 +1,12 @@
-// Lokasi CustomDrawer (misalnya: lib/widget/custom_drawer.dart)
-
 import 'package:flutter/material.dart';
 import 'package:project_uts_pariwisata/widget/chat_bot_ai.dart';
 import 'package:project_uts_pariwisata/widget/welcome_page.dart';
-
-// Import services dan model
 import '../services/auth_service.dart';
 import '../models/user_model.dart';
-// Asumsi impor untuk halaman login
 import '../login/login_screen.dart';
-// !!! PENTING: Ganti import ini ke lokasi file InformasiProfil Anda
 import '../widget/profile_page.dart';
 import '../widget/cuaca_page.dart';
 
-// WARNA UTAMA
 const Color primaryColor = Color(0xFF21899C);
 const Color primaryDark = Color(0xFF1B6F7D);
 
@@ -62,7 +55,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
     }
   }
 
-  // ================= LOGOUT ASLI (TIDAK DIUBAH) =================
   void _logout() async {
     await _authService.signOut();
     if (mounted) {
@@ -74,7 +66,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
     }
   }
 
-  // ================= TAMBAHAN: ALERT KONFIRMASI LOGOUT =================
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -203,7 +194,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
             const Spacer(),
 
-            // ===== LOGOUT DENGAN KONFIRMASI =====
             _drawerItem(
               icon: Icons.logout,
               title: 'Logout',

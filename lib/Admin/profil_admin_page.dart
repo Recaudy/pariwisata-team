@@ -6,12 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
 
-// Konfigurasi Warna Konsisten
 class AppColors {
-  static const Color primary = Color(0xFF21899C); // Teal Tua
-  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
-  static const Color accent = Color(0xFFF56B3F); // Oranye
-  static const Color highlight = Color(0xFFF9CA58); // Kuning
+  static const Color primary = Color(0xFF21899C);
+  static const Color secondary = Color(0xFF4DA1B0);
+  static const Color accent = Color(0xFFF56B3F);
+  static const Color highlight = Color(0xFFF9CA58);
 }
 
 class InformasiProfilAdmin extends StatefulWidget {
@@ -68,7 +67,6 @@ class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
       return const Scaffold(body: Center(child: Text("Admin tidak ditemukan")));
     }
 
-    // Penentuan Sumber Gambar Profil
     ImageProvider profileImage;
     if (_newProfileImageFile != null) {
       profileImage = FileImage(_newProfileImageFile!);
@@ -92,7 +90,6 @@ class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // BAGIAN ATAS (Header Background Teal)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.only(bottom: 40, top: 20),
@@ -159,7 +156,6 @@ class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
               ),
             ),
 
-            // BAGIAN INFORMASI (LIST INPUT/TILE DASAR)
             Padding(
               padding: const EdgeInsets.all(25.0),
               child: Column(
@@ -175,7 +171,6 @@ class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Info Nama
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -220,7 +215,6 @@ class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
 
                   const SizedBox(height: 16),
 
-                  // Info Email
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -265,7 +259,6 @@ class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
 
                   const SizedBox(height: 16),
 
-                  // Info Role
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -311,14 +304,11 @@ class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
 
                   const SizedBox(height: 40),
 
-                  // Tombol Logout Aksen Oranye
                   SizedBox(
                     width: double.infinity,
                     height: 55,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Memanggil dialog logout dari dashboard jika diperlukan,
-                        // atau navigasi langsung.
                         Navigator.pushNamedAndRemoveUntil(
                           context,
                           '/',

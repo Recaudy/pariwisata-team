@@ -5,12 +5,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/wisata_services.dart';
 import '../models/wisata_model.dart';
 
-// Tema Warna Konsisten
 class AppColors {
-  static const Color primary = Color(0xFF21899C); // Teal Tua
-  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
-  static const Color accent = Color(0xFFF56B3F); // Oranye
-  static const Color highlight = Color(0xFFF9CA58); // Kuning
+  static const Color primary = Color(0xFF21899C);
+  static const Color secondary = Color(0xFF4DA1B0);
+  static const Color accent = Color(0xFFF56B3F);
+  static const Color highlight = Color(0xFFF9CA58);
 }
 
 class WisataFormPage extends StatefulWidget {
@@ -139,7 +138,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Info
             Text(
               "Detail Destinasi",
               style: GoogleFonts.poppins(
@@ -155,7 +153,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
             ),
             const SizedBox(height: 25),
 
-            // Form Input Area (WIDGET DASAR LINIER)
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -172,7 +169,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Nama Wisata
                   const Text(
                     "Nama Wisata",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -192,7 +188,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Lokasi
                   const Text(
                     "Lokasi",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -212,7 +207,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Dropdown Kategori
                   const Text(
                     "Kategori",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -239,7 +233,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Deskripsi
                   const Text(
                     "Deskripsi Singkat",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -261,7 +254,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Sejarah
                   const Text(
                     "Sejarah",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -282,7 +274,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
                   ),
                   const SizedBox(height: 25),
 
-                  // Image Picker Area
                   const Text(
                     "Foto Destinasi",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -334,7 +325,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
             ),
             const SizedBox(height: 35),
 
-            // Tombol Simpan (WIDGET DASAR ELEVATEDBUTTON)
             SizedBox(
               width: double.infinity,
               height: 55,

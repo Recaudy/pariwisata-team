@@ -3,12 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'aksi_icon.dart';
 
-// 4 WARNA UTAMA APLIKASI
 class AppColors {
-  static const Color primary = Color(0xFF21899C); // Teal Tua
-  static const Color secondary = Color(0xFF4DA1B0); // Teal Muda
-  static const Color accent = Color(0xFFF56B3F); // Oranye
-  static const Color highlight = Color(0xFFF9CA58); // Kuning Cerah
+  static const Color primary = Color(0xFF21899C);
+  static const Color secondary = Color(0xFF4DA1B0);
+  static const Color accent = Color(0xFFF56B3F);
+  static const Color highlight = Color(0xFFF9CA58);
 }
 
 class DetailPage extends StatelessWidget {
@@ -17,7 +16,6 @@ class DetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Pengambilan Data
     final nama = (wisataData['nama'] ?? 'Tanpa nama').toString();
     final subJudul = (wisataData['sub_judul'] ?? '').toString();
     final image = (wisataData['image'] ?? wisataData['gambar'] ?? '')
@@ -33,7 +31,6 @@ class DetailPage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // 1. HEADER IMAGE
           Positioned(
             top: 0,
             left: 0,
@@ -52,7 +49,6 @@ class DetailPage extends StatelessWidget {
             ),
           ),
 
-          // 2. BACK BUTTON (MANUAL)
           Positioned(
             top: 50,
             left: 20,
@@ -73,11 +69,8 @@ class DetailPage extends StatelessWidget {
             ),
           ),
 
-          // 3. INFO FLOATING (NAMA & AKSI)
           Positioned(
-            top:
-                screenHeight *
-                0.25, // Diatur agar tidak mepet ke kontainer bawah
+            top: screenHeight * 0.25,
             left: 24,
             right: 24,
             child: Column(
@@ -118,19 +111,14 @@ class DetailPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 20,
-                ), // Memberi jarak lebih luas sebelum ikon aksi
-                // ROW AKSI MANUAL (LIKE, CHAT, RATING)
+                const SizedBox(height: 20),
                 Row(
                   children: [
-                    // LIKE BUTTON (Diberi Container agar area klik luas & tidak mepet)
                     Container(
                       margin: const EdgeInsets.only(right: 15),
                       child: LikeButton(),
                     ),
 
-                    // TOMBOL KOMENTAR
                     GestureDetector(
                       onTap: () => openKomentarSheet(context, wisataId),
                       child: Container(
@@ -148,7 +136,6 @@ class DetailPage extends StatelessWidget {
                       ),
                     ),
 
-                    // TOMBOL RATING
                     GestureDetector(
                       onTap: () => showDialog(
                         context: context,
@@ -170,7 +157,6 @@ class DetailPage extends StatelessWidget {
 
                     const Spacer(),
 
-                    // BADGE RATING RATA-RATA
                     StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection('ratings')
@@ -225,7 +211,6 @@ class DetailPage extends StatelessWidget {
             ),
           ),
 
-          // 4. KONTEN DESKRIPSI (GAYA GRADIENT MANUAL)
           Positioned(
             top: screenHeight * 0.45,
             bottom: 0,
@@ -244,7 +229,6 @@ class DetailPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // JUDUL DESKRIPSI
                     Row(
                       children: [
                         Container(
@@ -264,7 +248,6 @@ class DetailPage extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 15),
-                    // TEKS DESKRIPSI RATA KIRI KANAN
                     Text(
                       desc.isNotEmpty
                           ? desc
@@ -274,12 +257,11 @@ class DetailPage extends StatelessWidget {
                         color: Colors.black87,
                         height: 1.7,
                       ),
-                      textAlign: TextAlign.justify, // PERBAIKAN RATA KIRI KANAN
+                      textAlign: TextAlign.justify,
                     ),
 
                     const SizedBox(height: 35),
 
-                    // JUDUL SEJARAH
                     Row(
                       children: [
                         Container(
@@ -299,7 +281,6 @@ class DetailPage extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 15),
-                    // CONTAINER SEJARAH RATA KIRI KANAN
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(18),
@@ -320,8 +301,7 @@ class DetailPage extends StatelessWidget {
                           fontStyle: FontStyle.italic,
                           height: 1.6,
                         ),
-                        textAlign:
-                            TextAlign.justify, // PERBAIKAN RATA KIRI KANAN
+                        textAlign: TextAlign.justify,
                       ),
                     ),
                     const SizedBox(height: 40),

@@ -9,7 +9,6 @@ class AuthService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final _supabase = Supabase.instance.client;
 
-  // --- AMBIL DATA USER SAAT INI ---
   Future<UserModel?> getCurrentUserData() async {
     try {
       fb.User? firebaseUser = _auth.currentUser;
@@ -29,7 +28,6 @@ class AuthService {
     }
   }
 
-  // --- LOGIN DENGAN PERBAIKAN ROLE CHECK ---
   Future<String?> login({
     required String email,
     required String password,
@@ -42,14 +40,11 @@ class AuthService {
 
       String uid = userCredential.user!.uid;
 
-      // Terkadang Firestore butuh waktu sinkronisasi setelah login
-      // Kita coba ambil data dokumen user
       DocumentSnapshot userDoc = await _firestore
           .collection('users')
           .doc(uid)
           .get();
 
-      // Jika dokumen tidak ditemukan, kita tunggu 1 detik dan coba sekali lagi
       if (!userDoc.exists) {
         await Future.delayed(const Duration(seconds: 1));
         userDoc = await _firestore.collection('users').doc(uid).get();
@@ -58,7 +53,7 @@ class AuthService {
       if (userDoc.exists) {
         Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
         if (data.containsKey('role')) {
-          return data['role']; // Mengembalikan 'Admin' atau 'User'
+          return data['role'];
         }
         return "Role field missing";
       }
@@ -71,7 +66,6 @@ class AuthService {
     }
   }
 
-  // --- SIGNUP ---
   Future<String?> signup({
     required String name,
     required String email,
@@ -82,24 +76,22 @@ class AuthService {
       fb.UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
 
-      // Simpan ke Firestore dengan UID sebagai Document ID
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'uid': userCredential.user!.uid,
         'name': name,
         'email': email,
         'role': role,
         'photoUrl': '',
-        'createdAt': FieldValue.serverTimestamp(), 
+        'createdAt': FieldValue.serverTimestamp(),
       });
 
-      return null; // Sukses
+      return null;
     } on fb.FirebaseAuthException catch (e) {
       return e.message;
     } catch (e) {
       return e.toString();
     }
   }
-
 
   Future<String?> uploadProfilePicture(String filePath) async {
     try {
@@ -109,7 +101,6 @@ class AuthService {
       File file = File(filePath);
       final String fileName = 'profil/${user.uid}.jpg';
 
-      // 1. Upload ke Supabase Storage (Pastikan Bucket 'avatars' sudah ada dan PUBLIC)
       await _supabase.storage
           .from('profil')
           .upload(
@@ -118,12 +109,10 @@ class AuthService {
             fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
           );
 
-      // 2. Ambil URL Publik
       final String publicUrl = _supabase.storage
           .from('profil')
           .getPublicUrl(fileName);
 
-      // 3. Update link di Firestore agar tersinkron ke semua widget
       await _firestore.collection('users').doc(user.uid).update({
         'photoUrl': publicUrl,
       });
@@ -133,7 +122,6 @@ class AuthService {
       return e.toString();
     }
   }
-
 
   Future<String?> updateUserName(String newName) async {
     try {
@@ -149,7 +137,6 @@ class AuthService {
     }
   }
 
-
   Future<String?> updatePassword(String newPassword) async {
     try {
       final user = _auth.currentUser;
@@ -164,7 +151,6 @@ class AuthService {
       return e.toString();
     }
   }
-
 
   Future<void> signOut() async {
     await _auth.signOut();

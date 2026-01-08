@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'login_screen.dart'; 
-import '../services/auth_service.dart'; 
+import 'login_screen.dart';
+import '../services/auth_service.dart';
 
-// TEMA WARNA APLIKASI
 class AppColors {
-  static const Color primary   = Color(0xFF21899C); 
-  static const Color secondary = Color(0xFF4DA1B0); 
-  static const Color accent    = Color(0xFFF56B3F); 
-  static const Color highlight = Color(0xFFF9CA58); 
+  static const Color primary = Color(0xFF21899C);
+  static const Color secondary = Color(0xFF4DA1B0);
+  static const Color accent = Color(0xFFF56B3F);
+  static const Color highlight = Color(0xFFF9CA58);
 }
 
 class SignupScreen extends StatefulWidget {
@@ -19,13 +18,12 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  // --- LOGIKA & FUNGSI (TIDAK BERUBAH SAMA SEKALI) ---
   final AuthService _authService = AuthService();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  String _selectedRole = 'User'; 
+  String _selectedRole = 'User';
   bool _isLoading = false;
   bool isPasswordHidden = true;
 
@@ -39,7 +37,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _signup() async {
     FocusScope.of(context).unfocus();
-    setState(() { _isLoading = true; });
+    setState(() {
+      _isLoading = true;
+    });
 
     String? result = await _authService.signup(
       name: _nameController.text.trim(),
@@ -48,7 +48,9 @@ class _SignupScreenState extends State<SignupScreen> {
       role: _selectedRole,
     );
 
-    setState(() { _isLoading = false; });
+    setState(() {
+      _isLoading = false;
+    });
 
     if (result == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -57,15 +59,20 @@ class _SignupScreenState extends State<SignupScreen> {
           backgroundColor: Color(0xFF21899C),
         ),
       );
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Signup Gagal: $result'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text('Signup Gagal: $result'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
 
-  // --- TAMPILAN UI (WIDGET DASAR EKSPLISIT) ---
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -74,8 +81,6 @@ class _SignupScreenState extends State<SignupScreen> {
       backgroundColor: AppColors.primary,
       body: Stack(
         children: [
-
-          // Layer Gradasi Hijau
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -83,10 +88,7 @@ class _SignupScreenState extends State<SignupScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  AppColors.primary.withOpacity(0.7),
-                  AppColors.primary,
-                ],
+                colors: [AppColors.primary.withOpacity(0.7), AppColors.primary],
               ),
             ),
           ),
@@ -97,31 +99,47 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 50),
-                  
-                  // Header: Icon dan Judul
-                  const Icon(Icons.person_add_alt_1_rounded, size: 80, color: AppColors.highlight),
+
+                  const Icon(
+                    Icons.person_add_alt_1_rounded,
+                    size: 80,
+                    color: AppColors.highlight,
+                  ),
                   const SizedBox(height: 10),
                   Text.rich(
                     TextSpan(
-                      style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.poppins(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
                       children: const [
-                        TextSpan(text: 'SIGNUP ', style: TextStyle(color: Colors.white)),
-                        
+                        TextSpan(
+                          text: 'SIGNUP ',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 5),
                   const Text(
                     'Silahkan lengkapi data diri Anda',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
 
                   const SizedBox(height: 40),
 
-                  // INPUT NAMA LENGKAP
                   const Align(
                     alignment: Alignment.centerLeft,
-                    child: Text("Nama Lengkap", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      "Nama Lengkap",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Container(
@@ -134,7 +152,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       controller: _nameController,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.person_outline, color: Colors.white),
+                        prefixIcon: Icon(
+                          Icons.person_outline,
+                          color: Colors.white,
+                        ),
                         hintText: "Masukan Nama Anda",
                         hintStyle: TextStyle(color: Colors.white54),
                         border: InputBorder.none,
@@ -145,10 +166,15 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   const SizedBox(height: 15),
 
-                  // INPUT EMAIL
                   const Align(
                     alignment: Alignment.centerLeft,
-                    child: Text("Email", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      "Email",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Container(
@@ -161,7 +187,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       controller: _emailController,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.email_outlined, color: Colors.white),
+                        prefixIcon: Icon(
+                          Icons.email_outlined,
+                          color: Colors.white,
+                        ),
                         hintText: "Masukan Email Anda",
                         hintStyle: TextStyle(color: Colors.white54),
                         border: InputBorder.none,
@@ -172,10 +201,15 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   const SizedBox(height: 15),
 
-                  // INPUT PASSWORD
                   const Align(
                     alignment: Alignment.centerLeft,
-                    child: Text("Password", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      "Password",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Container(
@@ -189,25 +223,33 @@ class _SignupScreenState extends State<SignupScreen> {
                       obscureText: isPasswordHidden,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock_outline, color: Colors.white),
+                        prefixIcon: const Icon(
+                          Icons.lock_outline,
+                          color: Colors.white,
+                        ),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            isPasswordHidden ? Icons.visibility_off : Icons.visibility,
+                            isPasswordHidden
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: Colors.white,
                           ),
-                          onPressed: () => setState(() => isPasswordHidden = !isPasswordHidden),
+                          onPressed: () => setState(
+                            () => isPasswordHidden = !isPasswordHidden,
+                          ),
                         ),
                         hintText: "Buat Password",
                         hintStyle: const TextStyle(color: Colors.white54),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 15),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                        ),
                       ),
                     ),
                   ),
 
                   const SizedBox(height: 40),
 
-                  // TOMBOL SIGN UP
                   SizedBox(
                     width: double.infinity,
                     height: 55,
@@ -215,33 +257,46 @@ class _SignupScreenState extends State<SignupScreen> {
                       onPressed: _isLoading ? null : _signup,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.accent,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         elevation: 5,
                       ),
-                      child: _isLoading 
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'SIGN UP', 
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
-                          ),
+                      child: _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              'SIGN UP',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                   ),
 
                   const SizedBox(height: 30),
 
-                  // FOOTER (NAVIGASI KE LOGIN)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("Sudah Punya Akun? ", style: TextStyle(color: Colors.white)),
+                      const Text(
+                        "Sudah Punya Akun? ",
+                        style: TextStyle(color: Colors.white),
+                      ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const LoginScreen(),
+                            ),
+                          );
                         },
                         child: const Text(
                           "Login",
                           style: TextStyle(
-                            color: AppColors.highlight, 
+                            color: AppColors.highlight,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

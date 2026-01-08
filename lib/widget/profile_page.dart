@@ -25,7 +25,6 @@ class _InformasiProfilState extends State<InformasiProfil> {
   bool _showPassword = false;
   File? _newProfileImageFile;
 
-  // Warna Utama Konsisten
   final Color primaryColor = const Color(0xFF21899C);
   final Color accent = const Color(0xFFF56B3F);
 
@@ -42,7 +41,6 @@ class _InformasiProfilState extends State<InformasiProfil> {
     super.dispose();
   }
 
-  // --- LOGIKA FUNGSI ---
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -112,7 +110,6 @@ class _InformasiProfilState extends State<InformasiProfil> {
 
   @override
   Widget build(BuildContext context) {
-    // Logika Gambar Profil
     ImageProvider profileImg;
     if (_newProfileImageFile != null) {
       profileImg = FileImage(_newProfileImageFile!);
@@ -128,7 +125,6 @@ class _InformasiProfilState extends State<InformasiProfil> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // --- HEADER MELENGKUNG ---
             Stack(
               children: [
                 Container(
@@ -146,8 +142,11 @@ class _InformasiProfilState extends State<InformasiProfil> {
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        child: Stack( // MENGGUNAKAN STACK AGAR JUDUL BENAR-BENAR DI TENGAH
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        child: Stack(
                           alignment: Alignment.center,
                           children: [
                             Text(
@@ -163,7 +162,6 @@ class _InformasiProfilState extends State<InformasiProfil> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // FOTO PROFIL MANUAL
                       Center(
                         child: Stack(
                           children: [
@@ -188,7 +186,7 @@ class _InformasiProfilState extends State<InformasiProfil> {
                                 child: Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF9CA58), // Warna Highlight Kuning
+                                    color: const Color(0xFFF9CA58),
                                     shape: BoxShape.circle,
                                     border: Border.all(
                                       color: Colors.white,
@@ -203,7 +201,7 @@ class _InformasiProfilState extends State<InformasiProfil> {
                                 ),
                               ),
                             ),
-                              SizedBox(height: 40),
+                            SizedBox(height: 40),
                           ],
                         ),
                       ),
@@ -220,7 +218,6 @@ class _InformasiProfilState extends State<InformasiProfil> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // INPUT NAMA
                     Text(
                       "Nama Lengkap",
                       style: GoogleFonts.poppins(
@@ -255,7 +252,6 @@ class _InformasiProfilState extends State<InformasiProfil> {
 
                     const SizedBox(height: 20),
 
-                    // INPUT EMAIL (READ ONLY)
                     Text(
                       "Email",
                       style: GoogleFonts.poppins(
@@ -282,7 +278,6 @@ class _InformasiProfilState extends State<InformasiProfil> {
 
                     const SizedBox(height: 20),
 
-                    // INPUT PASSWORD
                     Text(
                       "Password Baru",
                       style: GoogleFonts.poppins(
@@ -328,7 +323,6 @@ class _InformasiProfilState extends State<InformasiProfil> {
 
                     const SizedBox(height: 40),
 
-                    // TOMBOL UPDATE MANUAL
                     GestureDetector(
                       onTap: _isLoading ? null : _updateProfileData,
                       child: Container(

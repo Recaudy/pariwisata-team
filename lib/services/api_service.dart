@@ -26,12 +26,10 @@ class ApiService {
         final data = json.decode(response.body);
         if (data['data'] == null || data['data'].isEmpty) return [];
 
-        // Mengambil SEMUA data cuaca (jam-jam berbeda)
         List<dynamic> allCuacaRaw = (data['data'][0]['cuaca'] as List)
             .expand((e) => e)
             .toList();
 
-        // Konversi ke List<CuacaModel>
         return allCuacaRaw
             .map((item) => CuacaModel.fromjson(item, locationName))
             .toList();
@@ -49,7 +47,6 @@ class ApiService {
     );
 
     List<List<CuacaModel>> results = await Future.wait(futures);
-    // Menggabungkan semua list menjadi satu list besar
     return results.expand((list) => list).toList();
   }
 }

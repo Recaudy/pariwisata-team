@@ -11,7 +11,6 @@ import 'widget/profile_page.dart';
 import 'models/user_model.dart';
 import 'services/auth_service.dart';
 
-// DEFINISI WARNA BARU
 const Color mainColor = Color(0xFF21899C);
 const Color subColor = Color(0xFFE6F4F6);
 
@@ -36,12 +35,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Pariwisata App',
       theme: ThemeData(
-        // Menggunakan subColor sebagai scaffold background agar terlihat bersih
         scaffoldBackgroundColor: subColor,
-        // Modifikasi tema Bottom Navigation Bar
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Colors.white, // Latar belakang putih agar bersih
-          selectedItemColor: mainColor, // Warna ikon saat dipilih (Tosca)
+          backgroundColor: Colors.white,
+          selectedItemColor: mainColor,
           unselectedItemColor: Colors.grey,
           elevation: 10,
         ),
@@ -85,7 +82,6 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     if (_isFetching) {
       return const Scaffold(
-        // Menggunakan subColor saat loading
         backgroundColor: subColor,
         body: Center(child: CircularProgressIndicator(color: mainColor)),
       );
@@ -112,7 +108,6 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: index,
         type: BottomNavigationBarType.fixed,
-        // Penyesuaian warna BottomNav
         backgroundColor: Colors.white,
         selectedItemColor: mainColor,
         unselectedItemColor: Colors.black45,

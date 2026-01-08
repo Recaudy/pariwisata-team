@@ -21,7 +21,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   String searchQuery = "";
   final TextEditingController _searchController = TextEditingController();
 
-  // Warna Utama Konsisten dengan Admin
   final Color primaryColor = const Color(0xFF21899C);
 
   @override
@@ -56,7 +55,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
       body: SafeArea(
         child: Stack(
           children: [
-            // --- KONTEN UTAMA ---
             SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +86,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 
                   const SizedBox(height: 20),
 
-                  // 1. SEARCH BAR (MANUAL)
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       vertical: 10,
@@ -132,7 +129,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     ),
                   ),
 
-                  // 2. EXPLORE TABS (MANUAL)
                   const Padding(
                     padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
                   ),
@@ -183,7 +179,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                   ),
                   const SizedBox(height: 15),
 
-                  // 3. LIST DESTINASI POPULER (MANUAL - FIX GAMBAR ERROR)
                   SizedBox(
                     height: 260,
                     child: StreamBuilder<QuerySnapshot>(
@@ -326,7 +321,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     ),
                   ),
 
-                  // 4. KATEGORI (MANUAL LINIER)
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Text(
@@ -343,7 +337,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       scrollDirection: Axis.horizontal,
                       children: [
                         const SizedBox(width: 20),
-                        // PANTAI
                         GestureDetector(
                           onTap: () => Navigator.push(
                             context,
@@ -384,7 +377,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             ),
                           ),
                         ),
-                        // BUKIT
                         GestureDetector(
                           onTap: () => Navigator.push(
                             context,
@@ -425,7 +417,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             ),
                           ),
                         ),
-                        // RELIGI
                         GestureDetector(
                           onTap: () => Navigator.push(
                             context,
@@ -487,7 +478,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // TANYA AI
                             GestureDetector(
                               onTap: () => Navigator.push(
                                 context,
@@ -539,7 +529,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                 ),
                               ),
                             ),
-                            // LOKASI
                             GestureDetector(
                               onTap: () => Navigator.push(
                                 context,
@@ -582,7 +571,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                 ),
                               ),
                             ),
-                            // CUACA
                             GestureDetector(
                               onTap: () => Navigator.push(
                                 context,
@@ -673,7 +661,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             final d =
                                 results[index].data() as Map<String, dynamic>;
                             return ListTile(
-                              // IMAGE DIHILANGKAN SESUAI PERMINTAAN
                               title: Text(
                                 d['nama'] ?? '',
                                 style: const TextStyle(
