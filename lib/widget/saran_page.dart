@@ -1,165 +1,114 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class MyCustomForm extends StatefulWidget {
-  const MyCustomForm({super.key});
+class FeedbackFormPage extends StatefulWidget {
+  const FeedbackFormPage({super.key});
 
   @override
-  _MyCustomFormState createState() => _MyCustomFormState();
+  State<FeedbackFormPage> createState() => _FeedbackFormPageState();
 }
 
-class _MyCustomFormState extends State<MyCustomForm> {
-  final _formKey = GlobalKey<FormState>();
+class _FeedbackFormPageState extends State<FeedbackFormPage> {
+  final TextEditingController _namaController = TextEditingController();
+  final TextEditingController _pesanController = TextEditingController();
 
-  final _namaController = TextEditingController();
-  final _lokasiController = TextEditingController();
-  final _deskripsiController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _submitForm() async {
+    final nama = _namaController.text.trim();
+    final pesan = _pesanController.text.trim();
+
+    if (nama.isEmpty || pesan.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Semua field wajib diisi")),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    await FirebaseFirestore.instance.collection('feedback').add({
+      'nama': nama,
+      'pesan': pesan,
+      'createdAt': Timestamp.now(),
+    });
+
+    setState(() => _isLoading = false);
+
+    _namaController.clear();
+    _pesanController.clear();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Terima kasih atas masukan Anda 🙏")),
+    );
+  }
 
   @override
   void dispose() {
     _namaController.dispose();
-    _lokasiController.dispose();
-    _deskripsiController.dispose();
+    _pesanController.dispose();
     super.dispose();
-  }
-
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Berhasil"),
-          content: const Text("Data pariwisata berhasil dikirim!"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("OK"),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(
-        "Form Data Pariwisata"
-        )
+      appBar: AppBar(
+        title: const Text("Form Kritik & Saran"),
+        centerTitle: true,
       ),
-      backgroundColor: Colors.grey[100],
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            width: 700,
-            height: 600,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  const Center(
-                    child: Text(
-                      "Form Tambah Data Pariwisata",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  TextFormField(
-                    controller: _namaController,
-                    decoration: InputDecoration(
-                      labelText: 'Nama Lokasi Pariwisata',
-
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Masukkan nama lokasi pariwisata';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  TextFormField(
-                    controller: _lokasiController,
-                    decoration: InputDecoration(
-                      labelText: 'Lokasi',      
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Masukkan lokasi wisata';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  TextFormField(
-                    controller: _deskripsiController,
-                    maxLines: 4,
-                    decoration: InputDecoration(
-                      labelText: 'Deskripsi',
-                      alignLabelWithHint: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Masukkan deskripsi wisata';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _showSuccessDialog();
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 60,
-                          vertical: 20,
-                        ),
-                      ),
-                      child: const Text("Submit"),
-                    ),
-                  ),
-                ],
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              "Masukan Anda",
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
+
+            const SizedBox(height: 20),
+
+            TextField(
+              controller: _namaController,
+              decoration: InputDecoration(
+                labelText: "Nama",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            TextField(
+              controller: _pesanController,
+              maxLines: 4,
+              decoration: InputDecoration(
+                labelText: "Pesan",
+                alignLabelWithHint: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            SizedBox(
+              height: 48,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _submitForm,
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text("KIRIM"),
+              ),
+            ),
+          ],
         ),
       ),
     );

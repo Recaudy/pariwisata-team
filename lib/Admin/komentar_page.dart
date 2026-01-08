@@ -39,7 +39,9 @@ class KomentarPage extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+              child: CircularProgressIndicator(
+                color: AppColors.primary
+              ),
             );
           }
 
@@ -267,7 +269,8 @@ class KomentarPage extends StatelessWidget {
                 );
               }
             },
-            child: const Text("Hapus",
+            child: const Text(
+              "Hapus",
              style: TextStyle(
               color: Colors.white,
               )

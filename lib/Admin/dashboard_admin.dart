@@ -59,14 +59,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF2F5F7),
       appBar: AppBar(
-        title: Text('Selamat Datang di Dashboard Admin',
+        title: Text(
+          'Selamat Datang di Dashboard Admin',
         style: GoogleFonts.poppins(
           fontWeight: FontWeight.bold,
           fontSize: 14,
           color: Colors.white,
         ),
         ),
-        elevation: 0, backgroundColor: AppColors.primary
+        elevation: 0, 
+        backgroundColor: AppColors.primary
         ),
       drawer: Drawer(
         child: Container(
@@ -120,7 +122,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 ),
               ),
               const SizedBox(height: 10),
-
               ListTile(
                 leading: const Icon(
                   Icons.dashboard_rounded,

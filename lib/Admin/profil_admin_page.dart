@@ -85,7 +85,11 @@ class _InformasiProfilAdminState extends State<InformasiProfilAdmin> {
       appBar: AppBar(
         title: Text(
           "PROFIL ADMIN",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold, 
+            fontSize: 18,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
         backgroundColor: AppColors.primary,

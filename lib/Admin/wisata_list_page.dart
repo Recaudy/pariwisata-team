@@ -65,7 +65,9 @@ class _WisataListPageState extends State<WisataListPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+              child: CircularProgressIndicator(
+                color: AppColors.primary
+              ),
             );
           }
           final wisataList = snapshot.data ?? [];
@@ -121,7 +123,9 @@ class _WisataListPageState extends State<WisataListPage> {
                               value: e.key,
                               child: Text(
                                 e.value,
-                                style: const TextStyle(color: Colors.white),
+                                style: const TextStyle(
+                                  color: Colors.white
+                                ),
                               ),
                             );
                           }).toList(),
@@ -200,11 +204,6 @@ class _WisataListPageState extends State<WisataListPage> {
                               ),
                               subtitle: Row(
                                 children: [
-                                  const Icon(
-                                    Icons.location_on,
-                                    size: 14,
-                                    color: AppColors.accent,
-                                  ),
                                   const SizedBox(width: 4),
                                   Expanded(
                                     child: Text(
@@ -228,14 +227,14 @@ class _WisataListPageState extends State<WisataListPage> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (_) =>
-                                              WisataFormPage(wisata: w),
+                                           WisataFormPage(wisata: w),
                                         ),
                                       );
                                     },
                                   ),
                                   IconButton(
                                     icon: const Icon(
-                                      Icons.delete_forever_rounded,
+                                      Icons.delete,
                                       color: Colors.redAccent,
                                     ),
                                     onPressed: () => _confirmDelete(context, w),
@@ -245,7 +244,7 @@ class _WisataListPageState extends State<WisataListPage> {
                             ),
                           );
                         },
-                      ),
+                ),
               ),
             ],
           );

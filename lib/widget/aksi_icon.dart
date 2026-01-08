@@ -181,7 +181,7 @@ class _KomentarSheetState extends State<KomentarSheet> {
             child: TextField(
               controller: _pesanController,
               decoration: InputDecoration(
-                hintText: "Tulis komentar...",
+                hintText: "Tulis komentar anda",
                 filled: true,
                 fillColor: Colors.grey.shade200,
                 border: OutlineInputBorder(
