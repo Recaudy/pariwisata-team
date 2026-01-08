@@ -49,11 +49,11 @@ class _KomentarSheetState extends State<KomentarSheet> {
 
     if (isiPesan.isEmpty || _currentUser == null) return;
 
-    final namaUser = await _getNamaUser(_currentUser!.uid);
+    final namaUser = await _getNamaUser(_currentUser.uid);
 
     await FirebaseFirestore.instance.collection('komentar').add({
       'wisataId': widget.wisataId,
-      'userId': _currentUser!.uid,
+      'userId': _currentUser.uid,
       'user': namaUser,
       'komentar': isiPesan,
       'createdAt': Timestamp.now(),
