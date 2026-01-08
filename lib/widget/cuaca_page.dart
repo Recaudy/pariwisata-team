@@ -52,13 +52,17 @@ class _WeatherPageState extends State<WeatherPage> {
         color: AppColors.highlight,
       );
     } else if (desc.contains('hujan')) {
-      return Icon(Icons.umbrella_rounded, size: size, color: color);
+      return Icon(Icons.umbrella_rounded, 
+      size: size, color: color);
     } else if (desc.contains('berawan')) {
-      return Icon(Icons.cloud_rounded, size: size, color: color);
+      return Icon(Icons.cloud_rounded, 
+      size: size, color: color);
     } else if (desc.contains('petir')) {
-      return Icon(Icons.thunderstorm_rounded, size: size, color: color);
+      return Icon(Icons.thunderstorm_rounded, 
+      size: size, color: color);
     } else {
-      return Icon(Icons.wb_cloudy_rounded, size: size, color: color);
+      return Icon(Icons.wb_cloudy_rounded, 
+      size: size, color: color);
     }
   }
 
@@ -132,7 +136,6 @@ class _WeatherPageState extends State<WeatherPage> {
           }
 
           final current = displayData.first;
-
           return Column(
             children: [
               Container(
@@ -202,9 +205,7 @@ class _WeatherPageState extends State<WeatherPage> {
                       ),
                     ),
                     const SizedBox(height: 15),
-
                     _getWeatherIcon(current.weatherDesc, size: 100),
-
                     const SizedBox(height: 10),
                     Text(
                       "${current.temperature}°C",
@@ -225,7 +226,6 @@ class _WeatherPageState extends State<WeatherPage> {
                   ],
                 ),
               ),
-
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(20),
@@ -240,7 +240,6 @@ class _WeatherPageState extends State<WeatherPage> {
                     } catch (e) {
                       timeLabel = "--:--";
                     }
-
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       padding: const EdgeInsets.all(15),

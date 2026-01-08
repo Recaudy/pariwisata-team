@@ -88,7 +88,8 @@ class _SignupScreenState extends State<SignupScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [AppColors.primary.withOpacity(0.7), AppColors.primary],
+                colors: [AppColors.primary.withOpacity(0.7),
+                 AppColors.primary],
               ),
             ),
           ),
@@ -99,7 +100,6 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 50),
-
                   const Icon(
                     Icons.person_add_alt_1_rounded,
                     size: 80,
@@ -115,7 +115,8 @@ class _SignupScreenState extends State<SignupScreen> {
                       children: const [
                         TextSpan(
                           text: 'SIGNUP ',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(
+                            color: Colors.white),
                         ),
                       ],
                     ),
@@ -157,7 +158,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           color: Colors.white,
                         ),
                         hintText: "Masukan Nama Anda",
-                        hintStyle: TextStyle(color: Colors.white54),
+                        hintStyle: TextStyle(
+                          color: Colors.white54
+                          ),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 15),
                       ),
@@ -165,7 +168,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
 
                   const SizedBox(height: 15),
-
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -181,18 +183,24 @@ class _SignupScreenState extends State<SignupScreen> {
                     decoration: BoxDecoration(
                       color: AppColors.secondary.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white24),
+                      border: Border.all(
+                        color: Colors.white24
+                        ),
                     ),
                     child: TextField(
                       controller: _emailController,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(
+                        color: Colors.white
+                        ),
                       decoration: const InputDecoration(
                         prefixIcon: Icon(
                           Icons.email_outlined,
                           color: Colors.white,
                         ),
                         hintText: "Masukan Email Anda",
-                        hintStyle: TextStyle(color: Colors.white54),
+                        hintStyle: TextStyle(
+                          color: Colors.white54
+                          ),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 15),
                       ),
@@ -200,7 +208,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
 
                   const SizedBox(height: 15),
-
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -249,7 +256,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
 
                   const SizedBox(height: 40),
-
                   SizedBox(
                     width: double.infinity,
                     height: 55,
@@ -274,15 +280,14 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                     ),
                   ),
-
                   const SizedBox(height: 30),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
                         "Sudah Punya Akun? ",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          color: Colors.white),
                       ),
                       GestureDetector(
                         onTap: () {

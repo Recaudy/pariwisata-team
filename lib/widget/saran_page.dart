@@ -45,7 +45,10 @@ class _MyCustomFormState extends State<MyCustomForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Form Data Pariwisata")),
+      appBar: AppBar(title: const Text(
+        "Form Data Pariwisata"
+        )
+      ),
       backgroundColor: Colors.grey[100],
       body: Center(
         child: SingleChildScrollView(

@@ -47,7 +47,8 @@ class _SplashScreenState extends State<SplashScreen> {
         children: const [
           TextSpan(
             text: 'LOGIN ',
-            style: TextStyle(fontWeight: FontWeight.w800),
+            style: TextStyle(
+              fontWeight: FontWeight.w800),
           ),
           TextSpan(
             text: 'PAGES \nUI ',
@@ -58,7 +59,8 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
           TextSpan(
             text: 'KIT',
-            style: TextStyle(fontWeight: FontWeight.w800),
+            style: TextStyle(
+              fontWeight: FontWeight.w800),
           ),
         ],
       ),

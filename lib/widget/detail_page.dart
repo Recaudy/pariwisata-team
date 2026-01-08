@@ -41,7 +41,9 @@ class DetailPage extends StatelessWidget {
               child: image.isEmpty
                   ? Container(
                       color: Colors.grey[300],
-                      child: const Icon(Icons.image_not_supported, size: 50),
+                      child: const Icon(
+                        Icons.image_not_supported,
+                         size: 50),
                     )
                   : image.startsWith('http')
                   ? Image.network(image, fit: BoxFit.cover)
@@ -156,7 +158,6 @@ class DetailPage extends StatelessWidget {
                     ),
 
                     const Spacer(),
-
                     StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection('ratings')

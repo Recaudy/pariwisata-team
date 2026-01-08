@@ -76,7 +76,9 @@ class _WisataFormPageState extends State<WisataFormPage> {
   void _simpan() async {
     if (selectedImage == null && widget.wisata == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Silakan pilih gambar destinasi')),
+        const SnackBar(content: 
+        Text('Silakan pilih gambar destinasi')
+        ),
       );
       return;
     }
@@ -149,10 +151,11 @@ class _WisataFormPageState extends State<WisataFormPage> {
             const SizedBox(height: 5),
             const Text(
               "Lengkapi formulir di bawah ini untuk mengelola data wisata",
-              style: TextStyle(color: Colors.grey, fontSize: 13),
+              style: TextStyle(
+                color: Colors.grey,
+                 fontSize: 13),
             ),
             const SizedBox(height: 25),
-
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -187,16 +190,17 @@ class _WisataFormPageState extends State<WisataFormPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
                   const Text(
                     "Lokasi",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      fontSize: 14),
                   ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: subJudulController,
                     decoration: InputDecoration(
-                      hintText: "Contoh: Belitung Sijuk",
+                      hintText: "Contoh: Sungailiat",
                       filled: true,
                       fillColor: Colors.grey[100],
                       border: OutlineInputBorder(
@@ -206,7 +210,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
                   const Text(
                     "Kategori",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -232,7 +235,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
                         setState(() => selectedKategori = value!),
                   ),
                   const SizedBox(height: 20),
-
                   const Text(
                     "Deskripsi Singkat",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -243,7 +245,7 @@ class _WisataFormPageState extends State<WisataFormPage> {
                     maxLines: 3,
                     decoration: InputDecoration(
                       hintText:
-                          "Ceritakan sedikit tentang keindahan tempat ini...",
+                          "Ceritakan sedikit tentang keindahan tempat ini",
                       filled: true,
                       fillColor: Colors.grey[100],
                       border: OutlineInputBorder(
@@ -253,7 +255,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
                   const Text(
                     "Sejarah",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -273,7 +274,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
                     ),
                   ),
                   const SizedBox(height: 25),
-
                   const Text(
                     "Foto Destinasi",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -310,7 +310,7 @@ class _WisataFormPageState extends State<WisataFormPage> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  "Klik untuk pilih foto",
+                                  "Klik untuk memilh foto",
                                   style: TextStyle(
                                     color: Colors.grey[500],
                                     fontSize: 13,
@@ -324,7 +324,6 @@ class _WisataFormPageState extends State<WisataFormPage> {
               ),
             ),
             const SizedBox(height: 35),
-
             SizedBox(
               width: double.infinity,
               height: 55,

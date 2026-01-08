@@ -50,7 +50,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Anda harus login terlebih dahulu.')),
+        const SnackBar(content: Text(
+          'Anda harus login terlebih dahulu.',
+          )
+          ),
       );
     }
   }
@@ -83,7 +86,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
               Navigator.pop(context);
               _logout();
             },
-            child: const Text('Logout'),
+            child: const Text(
+              'Logout'
+              ),
           ),
         ],
       ),
@@ -223,7 +228,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
       ),
       child: ListTile(
         leading: Icon(icon, color: color),
-        title: Text(title, style: TextStyle(color: color)),
+        title: Text(title, 
+        style: TextStyle(
+          color: color
+          )
+          ),
         onTap: onTap,
       ),
     );

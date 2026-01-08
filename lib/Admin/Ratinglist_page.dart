@@ -12,7 +12,6 @@ class AppColors {
 
 class RatingListPage extends StatelessWidget {
   final List<WisataModel> wisataList;
-
   final Map<String, List<int>>? ratingPerWisata;
 
   const RatingListPage({
@@ -61,7 +60,9 @@ class RatingListPage extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
+                child: CircularProgressIndicator(
+                  color: AppColors.primary,
+                ),
               );
             }
 
@@ -73,9 +74,7 @@ class RatingListPage extends StatelessWidget {
                 ),
               );
             }
-
             Map<String, List<int>> ratingMap = {};
-
             for (var doc in snapshot.data!.docs) {
               final data = doc.data() as Map<String, dynamic>;
               final wisataId = data['wisataId'] ?? '';
@@ -108,9 +107,58 @@ class RatingListPage extends StatelessWidget {
                 ),
               );
 
-              final average = ratings.reduce((a, b) => a + b) / ratings.length;
-
-              final card = _buildRatingCard(wisata.nama, average);
+              final average =
+                  ratings.reduce((a, b) => a + b) / ratings.length;
+              final Widget card = Container(
+                margin:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  leading: CircleAvatar(
+                    backgroundColor:
+                        AppColors.secondary.withOpacity(0.15),
+                  ),
+                  title: Text(
+                    wisata.nama,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  subtitle: Row(
+                    children: [
+                      const Icon(
+                        Icons.star_rounded,
+                        color: AppColors.highlight,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        "Rata-rata: ${average.toStringAsFixed(1)}",
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
 
               if (average >= 4) {
                 bagus.add(card);
@@ -123,104 +171,92 @@ class RatingListPage extends StatelessWidget {
 
             return TabBarView(
               children: [
-                _buildTabContent(bagus, "Tidak ada rating Bagus"),
-                _buildTabContent(cukup, "Tidak ada rating Cukup"),
-                _buildTabContent(buruk, "Tidak ada rating Buruk"),
+                bagus.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.star_border_rounded,
+                              size: 80,
+                              color: Colors.grey[300],
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              "Tidak ada rating Bagus",
+                              style: GoogleFonts.inter(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView(
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 12),
+                        physics: const BouncingScrollPhysics(),
+                        children: bagus,
+                      ),
+                cukup.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.star_border_rounded,
+                              size: 80,
+                              color: Colors.grey[300],
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              "Tidak ada rating Cukup",
+                              style: GoogleFonts.inter(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView(
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 12),
+                        physics: const BouncingScrollPhysics(),
+                        children: cukup,
+                      ),
+                buruk.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.star_border_rounded,
+                              size: 80,
+                              color: Colors.grey[300],
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              "Tidak ada rating Buruk",
+                              style: GoogleFonts.inter(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView(
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 12),
+                        physics: const BouncingScrollPhysics(),
+                        children: buruk,
+                 ),
               ],
             );
           },
         ),
       ),
-    );
-  }
-
-  Widget _buildRatingCard(String nama, double average) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 10,
-        ),
-        leading: CircleAvatar(
-          backgroundColor: AppColors.secondary.withOpacity(0.15),
-          child: Icon(
-            average >= 4
-                ? Icons.sentiment_very_satisfied
-                : average >= 3
-                ? Icons.sentiment_neutral
-                : Icons.sentiment_very_dissatisfied,
-            color: average >= 4
-                ? Colors.green
-                : average >= 3
-                ? AppColors.highlight
-                : AppColors.accent,
-          ),
-        ),
-        title: Text(
-          nama,
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-            color: AppColors.primary,
-          ),
-        ),
-        subtitle: Row(
-          children: [
-            const Icon(
-              Icons.star_rounded,
-              color: AppColors.highlight,
-              size: 20,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              "Rata-rata: ${average.toStringAsFixed(1)}",
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTabContent(List<Widget> items, String emptyMessage) {
-    if (items.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.star_border_rounded, size: 80, color: Colors.grey[300]),
-            const SizedBox(height: 10),
-            Text(
-              emptyMessage,
-              style: GoogleFonts.inter(
-                color: Colors.grey,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      physics: const BouncingScrollPhysics(),
-      children: items,
     );
   }
 }

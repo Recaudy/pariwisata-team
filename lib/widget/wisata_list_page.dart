@@ -74,7 +74,9 @@ class WisataListPage extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(14),
                         child: image.isEmpty
-                            ? Container(color: Colors.grey.shade300)
+                            ? Container(
+                              color: 
+                            Colors.grey.shade300)
                             : (image.startsWith('http')
                                   ? Image.network(
                                       image,

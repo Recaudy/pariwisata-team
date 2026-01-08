@@ -632,10 +632,14 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                   borderRadius: BorderRadius.circular(15),
                   color: Colors.white,
                   child: Container(
-                    constraints: const BoxConstraints(maxHeight: 350),
+                    constraints: const BoxConstraints(
+                      maxHeight: 350
+                      ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.grey.shade200),
+                      border: Border.all(
+                        color: Colors.grey.shade200
+                        ),
                     ),
                     child: StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
