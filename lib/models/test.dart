@@ -1,204 +1,125 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:google_fonts/google_fonts.dart';
+// import 'package:intl/intl.dart';
 
-class MyCustomForm extends StatefulWidget {
-  const MyCustomForm({super.key});
+// class AdminFeedbackPage extends StatelessWidget {
+//   const AdminFeedbackPage({super.key});
 
-  @override
-  _MyCustomFormState createState() => _MyCustomFormState();
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: const Color(0xFFF2F5F7),
+//       appBar: AppBar(
+//         title: const Text("Data Kritik & Saran"),
+//         centerTitle: true,
+//         elevation: 0,
+//         backgroundColor: const Color(0xFF21899C),
+//       ),
 
-class _MyCustomFormState extends State<MyCustomForm> {
-  final _formKey = GlobalKey<FormState>();
+//       body: StreamBuilder<QuerySnapshot>(
+//         stream: FirebaseFirestore.instance
+//             .collection('feedback')
+//             .orderBy('createdAt', descending: true)
+//             .snapshots(),
 
-  final _namaController = TextEditingController();
-  final _lokasiController = TextEditingController();
-  final _deskripsiController = TextEditingController();
-  final _hargaController = TextEditingController();
-  final _jumlahController = TextEditingController();
+//         builder: (context, snapshot) {
+//           if (snapshot.connectionState == ConnectionState.waiting) {
+//             return const Center(
+//               child: CircularProgressIndicator(),
+//             );
+//           }
 
-  @override
-  void dispose() {
-    _namaController.dispose();
-    _lokasiController.dispose();
-    _deskripsiController.dispose();
-    _hargaController.dispose();
-    _jumlahController.dispose();
-    super.dispose();
-  }
+//           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+//             return Center(
+//               child: Text(
+//                 "Belum ada data masuk",
+//                 style: GoogleFonts.inter(
+//                   fontSize: 16,
+//                   color: Colors.grey,
+//                 ),
+//               ),
+//             );
+//           }
 
-  void _showTotalDialog(double total) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Hasil Perhitungan"),
-        content: Text("Total: $total"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-    );
-  }
+//           final docs = snapshot.data!.docs;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Form Data Pariwisata")),
-      backgroundColor: Colors.grey[100],
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            width: 700,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  const Center(
-                    child: Text(
-                      "Form Tambah Data Pariwisata",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
+//           return ListView.builder(
+//             padding: const EdgeInsets.all(16),
+//             itemCount: docs.length,
+//             itemBuilder: (context, index) {
+//               final data = docs[index].data() as Map<String, dynamic>;
 
-                  TextFormField(
-                    controller: _namaController,
-                    decoration: InputDecoration(
-                      labelText: 'Nama Lokasi Pariwisata',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Masukkan nama lokasi pariwisata';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
+//               final nama = data['nama'] ?? '-';
+//               final pesan = data['pesan'] ?? '-';
+//               final Timestamp? time = data['createdAt'];
 
-                  TextFormField(
-                    controller: _lokasiController,
-                    decoration: InputDecoration(
-                      labelText: 'Lokasi',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Masukkan lokasi wisata';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
+//               final tanggal = time != null
+//                   ? DateFormat('dd MMM yyyy, HH:mm')
+//                       .format(time.toDate())
+//                   : '';
 
-                  TextFormField(
-                    controller: _deskripsiController,
-                    maxLines: 4,
-                    decoration: InputDecoration(
-                      labelText: 'Deskripsi',
-                      alignLabelWithHint: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Masukkan deskripsi wisata';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
+//               return Container(
+//                 margin: const EdgeInsets.only(bottom: 16),
+//                 padding: const EdgeInsets.all(16),
+//                 decoration: BoxDecoration(
+//                   color: Colors.white,
+//                   borderRadius: BorderRadius.circular(14),
+//                   boxShadow: [
+//                     BoxShadow(
+//                       color: Colors.black.withOpacity(0.05),
+//                       blurRadius: 8,
+//                       offset: const Offset(0, 4),
+//                     ),
+//                   ],
+//                 ),
 
-                  TextFormField(
-                    controller: _hargaController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: 'Harga',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Masukkan harga';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Row(
+//                       children: [
+//                         const CircleAvatar(
+//                           backgroundColor: Color(0xFF21899C),
+//                           child: Icon(Icons.person, color: Colors.white),
+//                         ),
+//                         const SizedBox(width: 12),
+//                         Expanded(
+//                           child: Text(
+//                             nama,
+//                             style: GoogleFonts.poppins(
+//                               fontSize: 15,
+//                               fontWeight: FontWeight.bold,
+//                             ),
+//                           ),
+//                         ),
+//                         Text(
+//                           tanggal,
+//                           style: GoogleFonts.inter(
+//                             fontSize: 11,
+//                             color: Colors.grey,
+//                           ),
+//                         ),
+//                       ],
+//                     ),
 
-                  TextFormField(
-                    controller: _jumlahController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: 'Jumlah',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Masukkan jumlah';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
+//                     const SizedBox(height: 12),
+//                     const Divider(),
 
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          double harga =
-                              double.tryParse(_hargaController.text) ?? 0;
-                          int jumlah =
-                              int.tryParse(_jumlahController.text) ?? 0;
-                          double total = harga * jumlah;
-
-                          _showTotalDialog(total);
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 60,
-                          vertical: 20,
-                        ),
-                      ),
-                      child: const Text("Submit"),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+//                     Text(
+//                       pesan,
+//                       style: GoogleFonts.inter(
+//                         fontSize: 14,
+//                         height: 1.5,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               );
+//             },
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }
